@@ -1,1560 +1,889 @@
+/* =========================================
+   GENERAL PAGE
+========================================= */
+
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
-
 
 body {
-    font-family: Arial, sans-serif;
-    background: #fdf5f8;
-    color: #222;
-    min-height: 100vh;
-}
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
 
-
-/* =====================================
-   PAGE 1
-===================================== */
-
-.selection-page {
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    min-height: 100vh;
-
-    background:
-        radial-gradient(
-            circle at top left,
-            #f7e5ee,
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at bottom right,
-            #e8edf8,
-            transparent 35%
-        ),
-        #fdf7f9;
-}
-
-
-.selection-container {
-
-    width: 90%;
-
-    max-width: 950px;
-
-    text-align: center;
-}
-
-
-.selection-container h1 {
-
-    font-size: 40px;
-
-    margin-bottom: 10px;
+    /* LIGHT BLUE BACKGROUND */
+    background: #eaf6ff;
 
     color: #333;
 }
 
+.container {
+    width: 96%;
+    max-width: 1500px;
 
-.subtitle {
-
-    font-size: 20px;
-
-    color: #777;
-
-    margin-bottom: 45px;
+    margin: 30px auto;
 }
 
 
-.payment-options {
+/* =========================================
+   PAGE HEADER
+========================================= */
 
-    display: grid;
+.page-header {
+    background: white;
 
-    grid-template-columns: repeat(2, 1fr);
+    padding: 24px 28px;
 
-    gap: 30px;
+    border-radius: 14px;
+
+    box-shadow: 0 4px 15px rgba(60, 120, 160, 0.12);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    margin: 0 0 6px 0;
+
+    color: #315f7d;
+
+    font-size: 32px;
+}
+
+.page-header p {
+    margin: 0;
+
+    color: #718391;
+
+    font-size: 15px;
 }
 
 
-.payment-card {
+/* =========================================
+   HEADER BUTTONS
+========================================= */
+
+.header-buttons {
+    display: flex;
+
+    gap: 10px;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.btn {
+    display: inline-block;
+
+    padding: 10px 18px;
+
+    border-radius: 8px;
 
     text-decoration: none;
 
-    color: #222;
+    font-weight: bold;
 
-    background: rgba(255,255,255,0.92);
+    border: none;
 
-    padding: 45px 35px;
+    cursor: pointer;
 
-    border-radius: 20px;
-
-    border: 1px solid #eee;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.07);
-
-    transition: 0.25s;
+    font-size: 14px;
 }
 
 
-.payment-card:hover {
+/* Blue primary button */
 
-    transform: translateY(-6px);
+.btn.primary {
+    background: #5b9ec2;
 
-    box-shadow:
-        0 15px 35px rgba(0,0,0,0.12);
+    color: white;
+}
+
+.btn.primary:hover {
+    background: #417f9f;
 }
 
 
-.weekly-card {
+/* Light blue secondary button */
 
-    border-top: 6px solid #9bb7e8;
+.btn.secondary {
+    background: #e4f3fc;
+
+    color: #315f7d;
+
+    border: 1px solid #cfe7f5;
+}
+
+.btn.secondary:hover {
+    background: #d5ecf9;
 }
 
 
-.monthly-card {
+/* =========================================
+   TABLE WRAPPER
+========================================= */
 
-    border-top: 6px solid #d5a6c5;
+.table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: white;
+
+    border-radius: 14px;
+
+    box-shadow: 0 4px 15px rgba(60, 120, 160, 0.12);
+
+    padding: 18px;
 }
 
 
-.payment-icon {
+/* =========================================
+   LEDGER TABLE
+========================================= */
 
-    font-size: 55px;
+.ledger-table {
+    width: 100%;
 
-    margin-bottom: 20px;
+    min-width: 1300px;
+
+    border-collapse: collapse;
+
+    font-size: 14px;
+}
+
+.ledger-table th {
+    background: #dceff9;
+
+    color: #315f7d;
+
+    padding: 13px 10px;
+
+    text-align: center;
+
+    border: 1px solid #c5e1ef;
+
+    white-space: nowrap;
+}
+
+.ledger-table td {
+    padding: 12px 10px;
+
+    text-align: center;
+
+    border: 1px solid #e0edf3;
+
+    background: white;
+
+    white-space: nowrap;
+}
+
+.ledger-table tbody tr:hover td {
+    background: #f5fbff;
 }
 
 
-.payment-card h2 {
+/* =========================================
+   CUSTOMER NAME
+========================================= */
 
-    font-size: 25px;
+.ledger-table td:first-child {
+    text-align: left;
 
-    margin-bottom: 12px;
+    color: #315f7d;
 }
 
 
-.payment-card p {
+/* =========================================
+   INSTALLMENT CELLS
+========================================= */
 
-    color: #777;
+.installment-cell {
+    width: 65px;
 
-    line-height: 1.6;
+    min-width: 65px;
+}
+
+.paid {
+    display: inline-flex;
+
+    width: 28px;
+
+    height: 28px;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #5b9ec2;
+
+    color: white;
+
+    font-weight: bold;
+
+    font-size: 16px;
+}
+
+.empty {
+    color: #b7c5cd;
+
+    font-size: 16px;
+}
+
+
+/* =========================================
+   TOTAL AND REMAINING
+========================================= */
+
+.total-paid {
+    font-weight: bold;
+
+    color: #397b63;
+}
+
+.remaining {
+    font-weight: bold;
+
+    color: #315f7d;
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.actions {
+    min-width: 270px;
+
+    white-space: nowrap;
+}
+
+.action-btn {
+    display: inline-block;
+
+    padding: 7px 10px;
+
+    margin: 2px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    border: none;
+
+    cursor: pointer;
+}
+
+
+/* Payment */
+
+.payment-btn {
+    background: #5b9ec2;
+
+    color: white;
+}
+
+.payment-btn:hover {
+    background: #417f9f;
+}
+
+
+/* History */
+
+.history-btn {
+    background: #e8f3f8;
+
+    color: #315f7d;
+}
+
+.history-btn:hover {
+    background: #d7eaf3;
+}
+
+
+/* Delete */
+
+.delete-btn {
+    background: #edf4f7;
+
+    color: #a34f4f;
+}
+
+.delete-btn:hover {
+    background: #e5eef2;
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.empty-state {
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 50px 30px;
+
+    text-align: center;
+
+    box-shadow: 0 4px 15px rgba(60, 120, 160, 0.12);
+}
+
+.empty-state h2 {
+    margin-top: 0;
+
+    color: #315f7d;
+
+    font-size: 28px;
+}
+
+.empty-state p {
+    color: #718391;
 
     margin-bottom: 25px;
 }
 
 
-.select-button {
+/* =========================================
+   FORMS
+========================================= */
 
+.form-container {
+    max-width: 700px;
+
+    margin: 30px auto;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 14px;
+
+    box-shadow: 0 4px 15px rgba(60, 120, 160, 0.12);
+}
+
+.form-container h1 {
+    margin-top: 0;
+
+    color: #315f7d;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-weight: bold;
+
+    color: #444;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid #d4e5ed;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #5b9ec2;
+
+    box-shadow: 0 0 0 2px rgba(91, 158, 194, 0.12);
+}
+
+
+/* =========================================
+   PAYMENT HISTORY
+========================================= */
+
+.history-container {
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 25px;
+
+    box-shadow: 0 4px 15px rgba(60, 120, 160, 0.12);
+}
+
+.history-container h1 {
+    color: #315f7d;
+
+    margin-top: 0;
+}
+
+.history-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 20px;
+}
+
+.history-table th {
+    background: #dceff9;
+
+    color: #315f7d;
+
+    padding: 12px;
+
+    border: 1px solid #c5e1ef;
+}
+
+.history-table td {
+    padding: 11px;
+
+    border: 1px solid #e0edf3;
+
+    text-align: center;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 800px) {
+
+    .container {
+        width: 94%;
+
+        margin: 15px auto;
+    }
+
+    .page-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 18px;
+    }
+
+    .header-buttons {
+        width: 100%;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .table-wrapper {
+        padding: 10px;
+    }
+}
+/* =========================================
+   FORM PAGE
+========================================= */
+
+.form-page {
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: 45px 20px;
+}
+
+
+/* =========================================
+   FORM CARD
+========================================= */
+
+.form-card {
+    width: 100%;
+
+    max-width: 720px;
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 35px 40px;
+
+    box-shadow: 0 8px 25px rgba(60, 120, 160, 0.14);
+
+    border: 1px solid #d9ebf4;
+}
+
+
+/* =========================================
+   FORM HEADER
+========================================= */
+
+.form-header {
+    margin-bottom: 28px;
+
+    text-align: center;
+}
+
+.form-header h1 {
+    margin: 0;
+
+    color: #315f7d;
+
+    font-size: 32px;
+}
+
+.form-header p {
+    margin: 8px 0 0;
+
+    color: #718391;
+
+    font-size: 15px;
+}
+
+.customer-name {
+    font-size: 17px !important;
+
+    font-weight: bold;
+
+    color: #5b9ec2 !important;
+}
+
+
+/* =========================================
+   FORM GROUP
+========================================= */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #315f7d;
+
+    font-weight: bold;
+
+    font-size: 14px;
+}
+
+
+/* =========================================
+   INPUTS
+========================================= */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #cfe1ea;
+
+    border-radius: 9px;
+
+    background: #fbfdff;
+
+    color: #333;
+
+    font-size: 15px;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #5b9ec2;
+
+    background: white;
+
+    box-shadow: 0 0 0 3px rgba(91, 158, 194, 0.10);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+/* =========================================
+   RUPEE INPUT
+========================================= */
+
+.input-with-symbol {
+    position: relative;
+}
+
+.input-with-symbol > span {
+    position: absolute;
+
+    left: 14px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #5b9ec2;
+
+    font-weight: bold;
+
+    z-index: 1;
+}
+
+.input-with-symbol input {
+    padding-left: 34px;
+}
+
+
+/* =========================================
+   PAYMENT SUMMARY
+========================================= */
+
+.payment-summary {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 12px;
+
+    margin-bottom: 28px;
+}
+
+.summary-item {
+    background: #f2f9fd;
+
+    border: 1px solid #d5eaf5;
+
+    border-radius: 10px;
+
+    padding: 14px;
+
+    text-align: center;
+}
+
+.summary-item span {
+    display: block;
+
+    color: #718391;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+}
+
+.summary-item strong {
+    color: #315f7d;
+
+    font-size: 17px;
+}
+
+.remaining-summary {
+    background: #eaf6ff;
+}
+
+
+/* =========================================
+   SCHEDULED PAYMENT
+========================================= */
+
+.scheduled-payment {
+    margin-top: 7px;
+
+    color: #718391;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   PAYMENT OPTIONS
+========================================= */
+
+.payment-options {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 12px;
+}
+
+.payment-option {
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 14px;
+
+    margin: 0 !important;
+
+    border: 1px solid #d5eaf5;
+
+    border-radius: 9px;
+
+    background: #f7fbfd;
+
+    cursor: pointer;
+
+    color: #315f7d !important;
+}
+
+.payment-option:hover {
+    background: #eef8fc;
+}
+
+.payment-option input {
+    width: auto !important;
+
+    margin: 0;
+
+    accent-color: #5b9ec2;
+}
+
+.payment-icon {
+    font-size: 20px;
+}
+
+
+/* =========================================
+   FORM BUTTONS
+========================================= */
+
+.form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 28px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #e2edf2;
+}
+
+.cancel-btn {
     display: inline-block;
 
     padding: 11px 20px;
 
     border-radius: 8px;
 
-    background: #f1e5eb;
-
-    font-weight: bold;
-}
-
-
-/* =====================================
-   LEDGER PAGES
-===================================== */
-
-.page {
-
-    width: 96%;
-
-    max-width: 1500px;
-
-    margin: 35px auto;
-}
-
-
-.ledger-header {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom: 30px;
-}
-
-
-.ledger-header h1 {
-
-    font-size: 32px;
-
-    margin-bottom: 7px;
-}
-
-
-.ledger-header p {
-
-    color: #777;
-
-    font-size: 15px;
-}
-
-
-.header-buttons {
-
-    display: flex;
-
-    gap: 12px;
-
-    align-items: center;
-}
-
-
-/* =====================================
-   BUTTONS
-===================================== */
-
-.back-btn {
-
-    display: inline-block;
-
     text-decoration: none;
 
-    color: #555;
+    color: #315f7d;
 
-    background: white;
+    background: #edf6fa;
 
-    border: 1px solid #ddd;
-
-    padding: 11px 17px;
-
-    border-radius: 8px;
-
-    font-weight: bold;
-}
-
-
-.add-btn {
-
-    display: inline-block;
-
-    text-decoration: none;
-
-    background: #444;
-
-    color: white;
-
-    padding: 12px 20px;
-
-    border-radius: 8px;
-
-    font-weight: bold;
-}
-
-
-.add-btn:hover {
-
-    background: #222;
-}
-
-
-/* =====================================
-   LEDGER
-===================================== */
-
-.ledger-section {
-
-    background: rgba(255,255,255,0.85);
-
-    padding: 20px;
-
-    border-radius: 15px;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.05);
-}
-
-
-.table-container {
-
-    width: 100%;
-
-    overflow-x: auto;
-}
-
-
-.ledger-table {
-
-    width: 100%;
-
-    min-width: 1150px;
-
-    border-collapse: collapse;
-
-    background: white;
-
-    table-layout: fixed;
-}
-
-
-.ledger-table th,
-.ledger-table td {
-
-    border: 2px solid #222;
-
-    text-align: center;
-
-    padding: 7px;
-
-    height: 45px;
-
-    font-size: 13px;
-}
-
-
-.ledger-table th {
-
-    background: #fafafa;
+    border: 1px solid #d4e8f1;
 
     font-weight: bold;
 
-    height: 52px;
+    font-size: 14px;
 }
 
-
-.ledger-table th:nth-child(1),
-.ledger-table td:nth-child(1) {
-
-    width: 130px;
+.cancel-btn:hover {
+    background: #dfedf3;
 }
-
-
-.ledger-table th:nth-child(2),
-.ledger-table td:nth-child(2) {
-
-    width: 105px;
-}
-
-
-.ledger-table th:nth-child(3),
-.ledger-table td:nth-child(3) {
-
-    width: 110px;
-}
-
-
-.ledger-table th:nth-child(n+4):nth-child(-n+13),
-.ledger-table td:nth-child(n+4):nth-child(-n+13) {
-
-    width: 65px;
-}
-
-
-.ledger-table th:last-child,
-.ledger-table td:last-child {
-
-    width: 115px;
-}
-
-
-.empty-row {
-
-    height: 100px !important;
-
-    color: #888;
-
-    font-size: 15px !important;
-}
-
-
-/* =====================================
-   ADD CUSTOMER FORM
-===================================== */
-
-.form-page {
-
-    min-height: 100vh;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    padding: 40px 20px;
-
-    background:
-        radial-gradient(
-            circle at top left,
-            #f7e5ee,
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at bottom right,
-            #e8edf8,
-            transparent 35%
-        ),
-        #fdf7f9;
-}
-
-
-.form-card {
-
-    width: 100%;
-
-    max-width: 600px;
-
-    background: white;
-
-    padding: 40px;
-
-    border-radius: 20px;
-
-    box-shadow:
-        0 12px 35px rgba(0,0,0,0.08);
-}
-
-
-.form-header {
-
-    text-align: center;
-
-    margin-bottom: 30px;
-}
-
-
-.form-header h1 {
-
-    font-size: 30px;
-
-    margin-bottom: 8px;
-}
-
-
-.form-header p {
-
-    color: #777;
-}
-
-
-.form-group {
-
-    margin-bottom: 20px;
-}
-
-
-.form-group label {
-
-    display: block;
-
-    font-weight: bold;
-
-    margin-bottom: 8px;
-
-    color: #444;
-}
-
-
-.form-group input,
-.form-group select {
-
-    width: 100%;
-
-    padding: 13px 14px;
-
-    border: 1px solid #d8d8d8;
-
-    border-radius: 8px;
-
-    font-size: 15px;
-
-    outline: none;
-
-    background: #fff;
-}
-
-
-.form-group input:focus,
-.form-group select:focus {
-
-    border-color: #c99bb4;
-
-    box-shadow:
-        0 0 0 3px rgba(201,155,180,0.15);
-}
-
-
-.form-buttons {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 15px;
-
-    margin-top: 30px;
-}
-
-
-.cancel-btn {
-
-    flex: 1;
-
-    text-align: center;
-
-    text-decoration: none;
-
-    padding: 13px;
-
-    border-radius: 8px;
-
-    background: #f1f1f1;
-
-    color: #444;
-
-    font-weight: bold;
-}
-
 
 .save-btn {
-
-    flex: 1;
+    padding: 11px 22px;
 
     border: none;
 
-    padding: 13px;
-
     border-radius: 8px;
 
-    background: #444;
+    background: #5b9ec2;
 
     color: white;
 
-    font-weight: bold;
+    font-size: 14px;
 
-    font-size: 15px;
+    font-weight: bold;
 
     cursor: pointer;
 }
-
 
 .save-btn:hover {
-
-    background: #222;
+    background: #417f9f;
 }
 
 
-/* =====================================
+/* =========================================
    MOBILE
-===================================== */
+========================================= */
 
-@media (max-width: 750px) {
+@media (max-width: 650px) {
 
-    .payment-options {
-
-        grid-template-columns: 1fr;
+    .form-page {
+        padding: 20px 12px;
     }
-
-
-    .selection-container h1 {
-
-        font-size: 30px;
-    }
-
-
-    .ledger-header {
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-        gap: 20px;
-    }
-
-
-    .header-buttons {
-
-        flex-wrap: wrap;
-    }
-
 
     .form-card {
-
-        padding: 25px;
+        padding: 28px 20px;
     }
 
-}
-/* =====================================
-   PAYMENT ACTION BUTTONS
-===================================== */
-
-.ledger-actions {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 6px;
-
-    align-items: center;
-}
-
-
-.pay-btn {
-
-    display: inline-block;
-
-    text-decoration: none;
-
-    background: #444;
-
-    color: white;
-
-    padding: 7px 10px;
-
-    border-radius: 6px;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    white-space: nowrap;
-}
-
-
-.pay-btn:hover {
-
-    background: #222;
-}
-
-
-.history-btn {
-
-    display: inline-block;
-
-    text-decoration: none;
-
-    background: #f1e5eb;
-
-    color: #444;
-
-    padding: 7px 10px;
-
-    border-radius: 6px;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    white-space: nowrap;
-}
-
-
-.history-btn:hover {
-
-    background: #e5d4dd;
-}
-
-
-/* =====================================
-   PAYMENT SUMMARY
-===================================== */
-
-.payment-summary {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 12px;
-
-    margin-bottom: 25px;
-}
-
-
-.summary-box {
-
-    background: #f8f8f8;
-
-    border: 1px solid #e2e2e2;
-
-    border-radius: 10px;
-
-    padding: 15px;
-
-    text-align: center;
-}
-
-
-.summary-box span {
-
-    display: block;
-
-    color: #777;
-
-    font-size: 13px;
-
-    margin-bottom: 6px;
-}
-
-
-.summary-box strong {
-
-    font-size: 20px;
-
-    color: #333;
-}
-
-
-.remaining-box {
-
-    background: #f7edf2;
-
-    border-color: #dfc2d0;
-}
-
-
-/* =====================================
-   PAYMENT METHOD
-===================================== */
-
-.payment-method-options {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 12px;
-}
-
-
-.method-option {
-
-    cursor: pointer;
-
-    border: 1px solid #d8d8d8;
-
-    border-radius: 9px;
-
-    padding: 13px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    background: #fff;
-
-    font-weight: bold;
-}
-
-
-.method-option:hover {
-
-    background: #faf5f7;
-
-    border-color: #c99bb4;
-}
-
-
-.method-option input {
-
-    width: auto;
-}
-
-
-.form-group small {
-
-    display: block;
-
-    margin-top: 6px;
-
-    color: #888;
-
-    font-size: 12px;
-}
-
-
-/* =====================================
-   MOBILE PAYMENT LAYOUT
-===================================== */
-
-@media (max-width: 600px) {
+    .form-header h1 {
+        font-size: 27px;
+    }
 
     .payment-summary {
-
         grid-template-columns: 1fr;
     }
 
-
-    .payment-method-options {
-
+    .payment-options {
         grid-template-columns: 1fr;
     }
 
-}
-/* =====================================
-   DELETE CUSTOMER BUTTON
-===================================== */
-
-.delete-btn {
-    border: none;
-
-    background: #f4d6d6;
-
-    color: #9a2222;
-
-    padding: 7px 10px;
-
-    border-radius: 6px;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    white-space: nowrap;
-
-    transition: 0.2s ease;
-}
-
-
-.delete-btn:hover {
-
-    background: #ecc0c0;
-
-    color: #7d1111;
-
-}
-
-
-/* =====================================
-   ACTION BUTTON LAYOUT
-===================================== */
-
-.ledger-actions {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 6px;
-
-    align-items: center;
-
-}
-
-
-/* =====================================
-   PAYMENT BUTTON
-===================================== */
-
-.pay-btn {
-
-    display: inline-block;
-
-    text-decoration: none;
-
-    background: #444;
-
-    color: white;
-
-    padding: 7px 10px;
-
-    border-radius: 6px;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    white-space: nowrap;
-
-}
-
-
-.pay-btn:hover {
-
-    background: #222;
-
-}
-
-
-/* =====================================
-   HISTORY BUTTON
-===================================== */
-
-.history-btn {
-
-    display: inline-block;
-
-    text-decoration: none;
-
-    background: #f1e5eb;
-
-    color: #444;
-
-    padding: 7px 10px;
-
-    border-radius: 6px;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    white-space: nowrap;
-
-}
-
-
-.history-btn:hover {
-
-    background: #e5d4dd;
-
-}
-
-
-/* =====================================
-   PAYMENT CHECK
-===================================== */
-
-.payment-check {
-
-    font-size: 16px;
-
-    color: #333;
-
-    font-weight: bold;
-
-}
-
-
-/* =====================================
-   TOTAL PAID
-===================================== */
-
-.total-paid {
-
-    font-weight: 500;
-
-}
-
-
-/* =====================================
-   REMAINING AMOUNT
-===================================== */
-
-.remaining-amount {
-
-    font-weight: 500;
-
-}
-
-
-/* =====================================
-   CUSTOMER NAME
-===================================== */
-
-.customer-name {
-
-    font-weight: bold;
-
-}
-
-
-/* =====================================
-   EMPTY MESSAGE
-===================================== */
-
-.empty-message {
-
-    padding: 30px;
-
-    text-align: center;
-
-    color: #777;
-
-    font-size: 14px;
-
-}
-/* =====================================================
-   WEEKLY / MONTHLY LEDGER PAGE
-===================================================== */
-
-* {
-    box-sizing: border-box;
-}
-
-
-body {
-    margin: 0;
-
-    padding: 0;
-
-    background: #fff5f9;
-
-    font-family: Arial, sans-serif;
-
-    color: #222;
-}
-
-
-/* =====================================================
-   MAIN PAGE
-===================================================== */
-
-.ledger-page {
-
-    width: 100%;
-
-    max-width: 1500px;
-
-    margin: 0 auto;
-
-    padding: 20px 18px 30px;
-
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.ledger-header {
-
-    width: 100%;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 20px;
-
-    margin-bottom: 18px;
-
-}
-
-
-.ledger-title {
-
-    flex: 1;
-
-}
-
-
-.ledger-title h1 {
-
-    margin: 0;
-
-    font-size: 30px;
-
-    color: #222;
-
-}
-
-
-.ledger-title p {
-
-    margin: 5px 0 0;
-
-    font-size: 15px;
-
-    color: #666;
-
-}
-
-
-/* =====================================================
-   RIGHT SIDE HEADER BUTTONS
-===================================================== */
-
-.ledger-header-buttons {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: flex-end;
-
-    gap: 10px;
-
-    flex-shrink: 0;
-
-}
-
-
-.home-button,
-.add-button {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    text-decoration: none;
-
-    padding: 10px 16px;
-
-    border-radius: 8px;
-
-    font-size: 14px;
-
-    font-weight: bold;
-
-    white-space: nowrap;
-
-    transition: 0.2s ease;
-
-}
-
-
-/* HOME */
-
-.home-button {
-
-    background: white;
-
-    color: #444;
-
-    border: 1px solid #d8c6ce;
-
-}
-
-
-.home-button:hover {
-
-    background: #f7edf2;
-
-}
-
-
-/* ADD CUSTOMER */
-
-.add-button {
-
-    background: #444;
-
-    color: white;
-
-    border: 1px solid #444;
-
-}
-
-
-.add-button:hover {
-
-    background: #222;
-
-}
-
-
-/* =====================================================
-   TABLE OUTER BOX
-===================================================== */
-
-.ledger-wrapper {
-
-    width: 100%;
-
-    overflow-x: auto;
-
-    overflow-y: hidden;
-
-    background: white;
-
-    border-radius: 14px;
-
-    box-shadow: 0 5px 20px rgba(100, 50, 70, 0.08);
-
-}
-
-
-/* =====================================================
-   TABLE
-===================================================== */
-
-.kanthu-table {
-
-    width: 100%;
-
-    min-width: 1150px;
-
-    border-collapse: collapse;
-
-    table-layout: fixed;
-
-}
-
-
-/* =====================================================
-   TABLE HEADER
-===================================================== */
-
-.kanthu-table th {
-
-    background: #fafafa;
-
-    border: 1px solid #333;
-
-    padding: 9px 5px;
-
-    height: 48px;
-
-    text-align: center;
-
-    vertical-align: middle;
-
-    font-size: 13px;
-
-    font-weight: bold;
-
-}
-
-
-/* =====================================================
-   TABLE CELLS
-===================================================== */
-
-.kanthu-table td {
-
-    border: 1px solid #333;
-
-    padding: 8px 5px;
-
-    height: 74px;
-
-    text-align: center;
-
-    vertical-align: middle;
-
-    font-size: 12px;
-
-}
-
-
-/* =====================================================
-   COLUMN WIDTHS
-===================================================== */
-
-.kanthu-table th:nth-child(1),
-.kanthu-table td:nth-child(1) {
-
-    width: 105px;
-
-}
-
-
-.kanthu-table th:nth-child(2),
-.kanthu-table td:nth-child(2) {
-
-    width: 105px;
-
-}
-
-
-.kanthu-table th:nth-child(3),
-.kanthu-table td:nth-child(3) {
-
-    width: 110px;
-
-}
-
-
-/* Week columns */
-
-.kanthu-table th:nth-child(n+4):nth-child(-n+13),
-.kanthu-table td:nth-child(n+4):nth-child(-n+13) {
-
-    width: 55px;
-
-}
-
-
-/* Total */
-
-.kanthu-table th:nth-child(14),
-.kanthu-table td:nth-child(14) {
-
-    width: 125px;
-
-}
-
-
-/* Remaining */
-
-.kanthu-table th:nth-child(15),
-.kanthu-table td:nth-child(15) {
-
-    width: 125px;
-
-}
-
-
-/* Actions */
-
-.kanthu-table th:nth-child(16),
-.kanthu-table td:nth-child(16) {
-
-    width: 115px;
-
-}
-
-
-/* =====================================================
-   CUSTOMER NAME
-===================================================== */
-
-.customer-name {
-
-    font-weight: bold;
-
-    font-size: 13px !important;
-
-    word-break: break-word;
-
-}
-
-
-/* =====================================================
-   PAYMENT CELLS
-===================================================== */
-
-.payment-cell {
-
-    font-size: 16px !important;
-
-}
-
-
-.payment-check {
-
-    font-size: 17px;
-
-    font-weight: bold;
-
-    color: #333;
-
-}
-
-
-/* =====================================================
-   TOTAL / REMAINING
-===================================================== */
-
-.total-paid {
-
-    font-weight: bold;
-
-}
-
-
-.remaining-amount {
-
-    font-weight: bold;
-
-}
-
-
-/* =====================================================
-   ACTIONS
-===================================================== */
-
-.actions-cell {
-
-    padding: 6px !important;
-
-}
-
-
-.ledger-actions {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 5px;
-
-}
-
-
-/* =====================================================
-   PAYMENT BUTTON
-===================================================== */
-
-.pay-btn {
-
-    width: 92px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    text-decoration: none;
-
-    background: #444;
-
-    color: white;
-
-    padding: 7px 5px;
-
-    border-radius: 6px;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-}
-
-
-.pay-btn:hover {
-
-    background: #222;
-
-}
-
-
-/* =====================================================
-   HISTORY BUTTON
-===================================================== */
-
-.history-btn {
-
-    width: 92px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    text-decoration: none;
-
-    background: #f1e5eb;
-
-    color: #444;
-
-    padding: 7px 5px;
-
-    border-radius: 6px;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-}
-
-
-.history-btn:hover {
-
-    background: #e5d4dd;
-
-}
-
-
-/* =====================================================
-   DELETE BUTTON
-===================================================== */
-
-.delete-btn {
-
-    width: 92px;
-
-    border: none;
-
-    background: #f4d6d6;
-
-    color: #9a2222;
-
-    padding: 7px 5px;
-
-    border-radius: 6px;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-}
-
-
-.delete-btn:hover {
-
-    background: #ecc0c0;
-
-    color: #7d1111;
-
-}
-
-
-/* =====================================================
-   EMPTY MESSAGE
-===================================================== */
-
-.empty-message {
-
-    padding: 30px !important;
-
-    text-align: center !important;
-
-    color: #777;
-
-    font-size: 14px !important;
-
-}
-
-
-/* =====================================================
-   SMALL SCREEN
-===================================================== */
-
-@media (max-width: 800px) {
-
-    .ledger-page {
-
-        padding: 15px 10px;
-
-    }
-
-
-    .ledger-header {
-
-        flex-direction: column;
+    .form-actions {
+        flex-direction: column-reverse;
 
         align-items: stretch;
-
     }
 
+    .cancel-btn,
+    .save-btn {
+        width: 100%;
 
-    .ledger-header-buttons {
-
-        justify-content: flex-end;
-
+        text-align: center;
     }
-
-
-    .ledger-title h1 {
-
-        font-size: 25px;
-
-    }
-
 }

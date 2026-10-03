@@ -1,95 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Monthly Kanthu</title>
+    <title>Monthly Customers</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
-
-
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
 <body>
 
-<div class="ledger-page">
+<div class="container">
 
+    <div class="page-header">
 
-    <!-- HEADER -->
-
-    <div class="ledger-header">
-
-        <div class="ledger-title">
-
-            <h1>Monthly Kanthu</h1>
-
-            <p>Monthly payment ledger</p>
-
+        <div>
+            <h1>Monthly Customers</h1>
+            <p>Monthly payment collection ledger</p>
         </div>
 
-
-        <div class="ledger-header-buttons">
-
-            <a href="/" class="home-button">
-                ← Home
-            </a>
-
-            <a href="/add-customer" class="add-button">
-                + Add Customer
-            </a>
-
+        <div class="header-buttons">
+            <a href="/" class="btn secondary">Home</a>
+            <a href="/add-customer" class="btn primary">+ Add Customer</a>
+            <a href="/weekly" class="btn secondary">Weekly</a>
         </div>
 
     </div>
 
 
+    {% if customers %}
 
-    <!-- TABLE -->
+    <div class="table-wrapper">
 
-    <div class="ledger-wrapper">
-
-        <table class="kanthu-table">
+        <table class="ledger-table">
 
             <thead>
 
                 <tr>
 
-                    <th>Names</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Amount Taken</th>
+                    <th>Starting Date</th>
 
-                    <th>Amount</th>
+                    <th>Month 1</th>
+                    <th>Month 2</th>
+                    <th>Month 3</th>
+                    <th>Month 4</th>
+                    <th>Month 5</th>
+                    <th>Month 6</th>
+                    <th>Month 7</th>
+                    <th>Month 8</th>
+                    <th>Month 9</th>
+                    <th>Month 10</th>
 
-                    <th>
-                        Starting<br>Date
-                    </th>
-
-                    <th>Month-1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>6</th>
-                    <th>7</th>
-                    <th>8</th>
-                    <th>9</th>
-                    <th>10</th>
-
-                    <th>
-                        Total<br>Amount
-                    </th>
-
-                    <th>
-                        Remaining
-                    </th>
-
-                    <th>
-                        Actions
-                    </th>
+                    <th>Total Paid</th>
+                    <th>Remaining</th>
+                    <th>Actions</th>
 
                 </tr>
 
@@ -98,54 +68,56 @@
 
             <tbody>
 
-
-            {% if customers %}
-
-
-                {% for customer in customers %}
-
+            {% for customer in customers %}
 
                 <tr>
 
-
-                    <td class="customer-name">
-
-                        {{ customer.name }}
-
+                    <td>
+                        <strong>{{ customer.name }}</strong>
                     </td>
 
 
                     <td>
+                        {{ customer.phone or '-' }}
+                    </td>
 
+
+                    <td>
                         ₹{{ "%.2f"|format(customer.amount_taken|float) }}
-
                     </td>
 
 
                     <td>
-
                         {{ customer.start_date }}
-
                     </td>
 
 
-                    {% for month_number in range(1, 11) %}
+                    {% for month in range(1, 11) %}
 
-                    <td class="payment-cell">
+                        <td class="installment-cell">
 
-                        {% for payment in customer.payments %}
+                            {% set found = namespace(value=false) %}
 
-                            {% if payment.installment_number == month_number %}
+                            {% for payment in customer.payments %}
 
-                                <span class="payment-check">
-                                    ✓
-                                </span>
+                                {% if payment.installment_number == month %}
+
+                                    <span class="paid">✓</span>
+
+                                    {% set found.value = true %}
+
+                                {% endif %}
+
+                            {% endfor %}
+
+
+                            {% if not found.value %}
+
+                                <span class="empty">-</span>
 
                             {% endif %}
 
-                        {% endfor %}
-
-                    </td>
+                        </td>
 
                     {% endfor %}
 
@@ -157,76 +129,48 @@
                     </td>
 
 
-                    <td class="remaining-amount">
+                    <td class="remaining">
 
                         ₹{{ "%.2f"|format(customer.remaining_amount|float) }}
 
                     </td>
 
 
-                    <td class="actions-cell">
+                    <td class="actions">
 
-                        <div class="ledger-actions">
-
-
-                            <a href="{{ url_for('add_payment', customer_id=customer.id) }}"
-                               class="pay-btn">
-
-                                + Payment
-
-                            </a>
+                        <a
+                            href="/add-payment/{{ customer.id }}"
+                            class="action-btn payment-btn">
+                            + Payment
+                        </a>
 
 
-                            <a href="{{ url_for('payment_history', customer_id=customer.id) }}"
-                               class="history-btn">
-
-                                History
-
-                            </a>
-
-
-                            <form method="POST"
-                                  action="{{ url_for('delete_customer', customer_id=customer.id) }}"
-                                  onsubmit="return confirm('Are you sure you want to delete {{ customer.name }}? This will also delete their payment history.');">
-
-                                <button type="submit"
-                                        class="delete-btn">
-
-                                    🗑 Delete
-
-                                </button>
-
-                            </form>
+                        <a
+                            href="/payment-history/{{ customer.id }}"
+                            class="action-btn history-btn">
+                            History
+                        </a>
 
 
-                        </div>
+                        <form
+                            action="/delete-customer/{{ customer.id }}"
+                            method="POST"
+                            style="display:inline;"
+                            onsubmit="return confirm('Are you sure you want to delete {{ customer.name }}?');">
 
-                    </td>
+                            <button
+                                type="submit"
+                                class="action-btn delete-btn">
+                                🗑 Delete
+                            </button>
 
-
-                </tr>
-
-
-                {% endfor %}
-
-
-            {% else %}
-
-
-                <tr>
-
-                    <td colspan="16"
-                        class="empty-message">
-
-                        No active monthly customers found.
+                        </form>
 
                     </td>
 
                 </tr>
 
-
-            {% endif %}
-
+            {% endfor %}
 
             </tbody>
 
@@ -235,8 +179,25 @@
     </div>
 
 
+    {% else %}
+
+        <div class="empty-state">
+
+            <h2>No Monthly Customers</h2>
+
+            <p>
+                There are currently no active monthly customers.
+            </p>
+
+            <a href="/add-customer" class="btn primary">
+                + Add Customer
+            </a>
+
+        </div>
+
+    {% endif %}
+
 </div>
 
 </body>
-
 </html>

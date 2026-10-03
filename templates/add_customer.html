@@ -1,20 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Add Customer</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
-
 
 <body>
 
@@ -23,28 +17,28 @@
     <div class="form-card">
 
         <div class="form-header">
-
             <h1>Add Customer</h1>
 
-            <p>Enter the customer's payment details</p>
-
+            <p>
+                Enter the customer's payment details
+            </p>
         </div>
 
 
-        <form method="POST"
-              action="/add-customer">
+        <form method="POST" action="/add-customer">
 
 
-            <!-- CUSTOMER NAME -->
+            <!-- Customer Name -->
 
             <div class="form-group">
 
-                <label>
+                <label for="name">
                     Customer Name
                 </label>
 
                 <input
                     type="text"
+                    id="name"
                     name="name"
                     placeholder="Enter customer name"
                     required>
@@ -52,66 +46,74 @@
             </div>
 
 
-            <!-- PHONE -->
+            <!-- Phone -->
 
             <div class="form-group">
 
-                <label>
+                <label for="phone">
                     Phone Number
                 </label>
 
                 <input
-                    type="tel"
+                    type="text"
+                    id="phone"
                     name="phone"
                     placeholder="Enter phone number">
 
             </div>
 
 
-            <!-- AMOUNT -->
+            <!-- Amount Taken -->
 
             <div class="form-group">
 
-                <label>
+                <label for="amount_taken">
                     Amount Taken
                 </label>
 
-                <input
-                    type="number"
-                    name="amount_taken"
-                    placeholder="₹ Enter amount"
-                    min="1"
-                    step="0.01"
-                    required>
+                <div class="input-with-symbol">
+                    <span>₹</span>
+
+                    <input
+                        type="number"
+                        id="amount_taken"
+                        name="amount_taken"
+                        placeholder="Enter amount"
+                        step="0.01"
+                        min="0"
+                        required>
+                </div>
 
             </div>
 
 
-            <!-- START DATE -->
+            <!-- Starting Date -->
 
             <div class="form-group">
 
-                <label>
+                <label for="start_date">
                     Starting Date
                 </label>
 
                 <input
                     type="date"
+                    id="start_date"
                     name="start_date"
                     required>
 
             </div>
 
 
-            <!-- PAYMENT TYPE -->
+            <!-- Payment Type -->
 
             <div class="form-group">
 
-                <label>
+                <label for="payment_type">
                     Payment Type
                 </label>
 
                 <select
+                    id="payment_type"
                     name="payment_type"
                     required>
 
@@ -132,28 +134,33 @@
             </div>
 
 
-            <!-- PAYMENT AMOUNT -->
+            <!-- Payment Amount -->
 
             <div class="form-group">
 
-                <label>
+                <label for="payment_amount">
                     Payment Amount
                 </label>
 
-                <input
-                    type="number"
-                    name="payment_amount"
-                    placeholder="₹ Enter weekly/monthly payment"
-                    min="1"
-                    step="0.01"
-                    required>
+                <div class="input-with-symbol">
+                    <span>₹</span>
+
+                    <input
+                        type="number"
+                        id="payment_amount"
+                        name="payment_amount"
+                        placeholder="Enter weekly/monthly payment"
+                        step="0.01"
+                        min="0"
+                        required>
+                </div>
 
             </div>
 
 
-            <!-- BUTTONS -->
+            <!-- Buttons -->
 
-            <div class="form-buttons">
+            <div class="form-actions">
 
                 <a href="/" class="cancel-btn">
                     Cancel
@@ -162,13 +169,10 @@
                 <button
                     type="submit"
                     class="save-btn">
-
                     Save Customer
-
                 </button>
 
             </div>
-
 
         </form>
 
@@ -177,5 +181,4 @@
 </div>
 
 </body>
-
 </html>

@@ -1,79 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Finance Management</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #eaf6ff;
+            min-height: 100vh;
+        }
+
+        .home {
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 30px;
+        }
+
+        .home-card {
+            width: 100%;
+            max-width: 650px;
+
+            background: white;
+
+            padding: 50px 45px;
+
+            border-radius: 20px;
+
+            text-align: center;
+
+            box-shadow: 0 8px 30px rgba(60, 120, 160, 0.15);
+        }
+
+        h1 {
+            margin: 0;
+
+            font-size: 36px;
+
+            color: #315f7d;
+        }
+
+        .subtitle {
+            margin-top: 10px;
+
+            color: #718391;
+
+            font-size: 16px;
+        }
+
+        .options {
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 22px;
+
+            margin-top: 35px;
+        }
+
+        .option {
+            text-decoration: none;
+
+            background: #f2f9fd;
+
+            border: 1px solid #cfe7f5;
+
+            border-radius: 15px;
+
+            padding: 30px 20px;
+
+            color: #315f7d;
+
+            transition: 0.2s;
+        }
+
+        .option:hover {
+            background: #e4f3fc;
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 6px 15px rgba(60, 120, 160, 0.12);
+        }
+
+        .option-icon {
+            font-size: 38px;
+
+            margin-bottom: 12px;
+        }
+
+        .option-title {
+            font-size: 21px;
+
+            font-weight: bold;
+        }
+
+        .option-text {
+            margin-top: 7px;
+
+            font-size: 14px;
+
+            color: #7b8d99;
+        }
+
+        .footer {
+            margin-top: 30px;
+
+            font-size: 13px;
+
+            color: #9aaab4;
+        }
+
+        @media (max-width: 600px) {
+
+            .home {
+                padding: 15px;
+            }
+
+            .home-card {
+                padding: 35px 20px;
+            }
+
+            h1 {
+                font-size: 29px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
+<body>
 
-<body class="selection-page">
+<div class="home">
 
-    <div class="selection-container">
+    <div class="home-card">
 
         <h1>Finance Management</h1>
 
         <p class="subtitle">
-            Select Payment Type
+            Manage your payment collections easily
         </p>
 
+        <div class="options">
 
-        <div class="payment-options">
+            <a href="/weekly" class="option">
 
-            <a href="/weekly"
-               class="payment-card weekly-card">
-
-                <div class="payment-icon">
+                <div class="option-icon">
                     📅
                 </div>
 
-                <h2>Weekly Payment</h2>
+                <div class="option-title">
+                    Weekly
+                </div>
 
-                <p>
-                    Manage customers who make
-                    payments every week.
-                </p>
-
-                <span class="select-button">
-                    Open Weekly →
-                </span>
+                <div class="option-text">
+                    View weekly customers
+                </div>
 
             </a>
 
 
-            <a href="/monthly"
-               class="payment-card monthly-card">
+            <a href="/monthly" class="option">
 
-                <div class="payment-icon">
+                <div class="option-icon">
                     🗓️
                 </div>
 
-                <h2>Monthly Payment</h2>
+                <div class="option-title">
+                    Monthly
+                </div>
 
-                <p>
-                    Manage customers who make
-                    payments every month.
-                </p>
-
-                <span class="select-button">
-                    Open Monthly →
-                </span>
+                <div class="option-text">
+                    View monthly customers
+                </div>
 
             </a>
 
         </div>
 
+        <div class="footer">
+            Finance Management System
+        </div>
+
     </div>
 
-</body>
+</div>
 
+</body>
 </html>
