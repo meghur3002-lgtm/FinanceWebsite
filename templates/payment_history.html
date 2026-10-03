@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Payment History</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- HEADER -->
+
+    <div class="ledger-header">
+
+        <div>
+
+            <h1>
+                Payment History
+            </h1>
+
+            <p>
+                {{ customer.name }}
+            </p>
+
+        </div>
+
+
+        <div class="header-buttons">
+
+            {% if customer.payment_type == "Weekly" %}
+
+                <a href="/weekly"
+                   class="back-btn">
+
+                    ← Weekly
+
+                </a>
+
+            {% else %}
+
+                <a href="/monthly"
+                   class="back-btn">
+
+                    ← Monthly
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- PAYMENT TABLE -->
+
+    <div class="ledger-section">
+
+        <div class="table-container">
+
+            <table class="ledger-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Payment No.
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Amount Paid
+                        </th>
+
+                        <th>
+                            Payment Method
+                        </th>
+
+                        <th>
+                            Notes
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for payment in payments %}
+
+                    <tr>
+
+                        <td>
+                            {{ payment.installment_number }}
+                        </td>
+
+                        <td>
+                            {{ payment.payment_date }}
+                        </td>
+
+                        <td>
+                            ₹{{ "%.2f"|format(payment.amount_paid) }}
+                        </td>
+
+                        <td>
+
+                            {% if payment.payment_method == "Cash" %}
+
+                                💵 Cash
+
+                            {% else %}
+
+                                📱 Online
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ payment.notes or "-" }}
+                        </td>
+
+                    </tr>
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="5"
+                            class="empty-row">
+
+                            No payments recorded yet.
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

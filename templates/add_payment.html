@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Payment</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="form-page">
+
+    <div class="form-card">
+
+        <div class="form-header">
+
+            <h1>Record Payment</h1>
+
+            <p>
+                {{ customer.name }}
+            </p>
+
+        </div>
+
+
+        <!-- PAYMENT SUMMARY -->
+
+        <div class="payment-summary">
+
+            <div class="summary-box">
+
+                <span>Total Amount</span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(customer.amount_taken) }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <span>Already Paid</span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(total_paid) }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-box remaining-box">
+
+                <span>Remaining</span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(remaining_amount) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENT FORM -->
+
+        <form method="POST"
+              action="{{ url_for('add_payment', customer_id=customer.id) }}">
+
+
+            <!-- PAYMENT DATE -->
+
+            <div class="form-group">
+
+                <label>
+                    Payment Date
+                </label>
+
+                <input
+                    type="date"
+                    name="payment_date"
+                    required>
+
+            </div>
+
+
+            <!-- PAYMENT AMOUNT -->
+
+            <div class="form-group">
+
+                <label>
+                    Amount Paid
+                </label>
+
+                <input
+                    type="number"
+                    name="amount_paid"
+                    value="{{ customer.payment_amount }}"
+                    min="0.01"
+                    max="{{ remaining_amount }}"
+                    step="0.01"
+                    required>
+
+                <small>
+                    Scheduled payment:
+                    ₹{{ "%.2f"|format(customer.payment_amount) }}
+                </small>
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label>
+                    Payment Method
+                </label>
+
+
+                <div class="payment-method-options">
+
+                    <label class="method-option">
+
+                        <input
+                            type="radio"
+                            name="payment_method"
+                            value="Cash"
+                            checked>
+
+                        <span>
+                            💵 Cash
+                        </span>
+
+                    </label>
+
+
+                    <label class="method-option">
+
+                        <input
+                            type="radio"
+                            name="payment_method"
+                            value="Online">
+
+                        <span>
+                            📱 Online
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group">
+
+                <label>
+                    Notes
+                </label>
+
+                <input
+                    type="text"
+                    name="notes"
+                    placeholder="Optional note">
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="form-buttons">
+
+                {% if customer.payment_type == "Weekly" %}
+
+                    <a href="/weekly"
+                       class="cancel-btn">
+
+                        Cancel
+
+                    </a>
+
+                {% else %}
+
+                    <a href="/monthly"
+                       class="cancel-btn">
+
+                        Cancel
+
+                    </a>
+
+                {% endif %}
+
+
+                <button
+                    type="submit"
+                    class="save-btn">
+
+                    Save Payment
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

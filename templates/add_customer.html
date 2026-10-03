@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Customer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="form-page">
+
+    <div class="form-card">
+
+        <div class="form-header">
+
+            <h1>Add Customer</h1>
+
+            <p>Enter the customer's payment details</p>
+
+        </div>
+
+
+        <form method="POST"
+              action="/add-customer">
+
+
+            <!-- CUSTOMER NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Customer Name
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter customer name"
+                    required>
+
+            </div>
+
+
+            <!-- PHONE -->
+
+            <div class="form-group">
+
+                <label>
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Enter phone number">
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label>
+                    Amount Taken
+                </label>
+
+                <input
+                    type="number"
+                    name="amount_taken"
+                    placeholder="₹ Enter amount"
+                    min="1"
+                    step="0.01"
+                    required>
+
+            </div>
+
+
+            <!-- START DATE -->
+
+            <div class="form-group">
+
+                <label>
+                    Starting Date
+                </label>
+
+                <input
+                    type="date"
+                    name="start_date"
+                    required>
+
+            </div>
+
+
+            <!-- PAYMENT TYPE -->
+
+            <div class="form-group">
+
+                <label>
+                    Payment Type
+                </label>
+
+                <select
+                    name="payment_type"
+                    required>
+
+                    <option value="">
+                        Select payment type
+                    </option>
+
+                    <option value="Weekly">
+                        Weekly
+                    </option>
+
+                    <option value="Monthly">
+                        Monthly
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PAYMENT AMOUNT -->
+
+            <div class="form-group">
+
+                <label>
+                    Payment Amount
+                </label>
+
+                <input
+                    type="number"
+                    name="payment_amount"
+                    placeholder="₹ Enter weekly/monthly payment"
+                    min="1"
+                    step="0.01"
+                    required>
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="form-buttons">
+
+                <a href="/" class="cancel-btn">
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="save-btn">
+
+                    Save Customer
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

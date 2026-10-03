@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Monthly Kanthu</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="ledger-page">
+
+
+    <!-- HEADER -->
+
+    <div class="ledger-header">
+
+        <div class="ledger-title">
+
+            <h1>Monthly Kanthu</h1>
+
+            <p>Monthly payment ledger</p>
+
+        </div>
+
+
+        <div class="ledger-header-buttons">
+
+            <a href="/" class="home-button">
+                ← Home
+            </a>
+
+            <a href="/add-customer" class="add-button">
+                + Add Customer
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TABLE -->
+
+    <div class="ledger-wrapper">
+
+        <table class="kanthu-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Names</th>
+
+                    <th>Amount</th>
+
+                    <th>
+                        Starting<br>Date
+                    </th>
+
+                    <th>Month-1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                    <th>9</th>
+                    <th>10</th>
+
+                    <th>
+                        Total<br>Amount
+                    </th>
+
+                    <th>
+                        Remaining
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% if customers %}
+
+
+                {% for customer in customers %}
+
+
+                <tr>
+
+
+                    <td class="customer-name">
+
+                        {{ customer.name }}
+
+                    </td>
+
+
+                    <td>
+
+                        ₹{{ "%.2f"|format(customer.amount_taken|float) }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ customer.start_date }}
+
+                    </td>
+
+
+                    {% for month_number in range(1, 11) %}
+
+                    <td class="payment-cell">
+
+                        {% for payment in customer.payments %}
+
+                            {% if payment.installment_number == month_number %}
+
+                                <span class="payment-check">
+                                    ✓
+                                </span>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </td>
+
+                    {% endfor %}
+
+
+                    <td class="total-paid">
+
+                        ₹{{ "%.2f"|format(customer.total_paid|float) }}
+
+                    </td>
+
+
+                    <td class="remaining-amount">
+
+                        ₹{{ "%.2f"|format(customer.remaining_amount|float) }}
+
+                    </td>
+
+
+                    <td class="actions-cell">
+
+                        <div class="ledger-actions">
+
+
+                            <a href="{{ url_for('add_payment', customer_id=customer.id) }}"
+                               class="pay-btn">
+
+                                + Payment
+
+                            </a>
+
+
+                            <a href="{{ url_for('payment_history', customer_id=customer.id) }}"
+                               class="history-btn">
+
+                                History
+
+                            </a>
+
+
+                            <form method="POST"
+                                  action="{{ url_for('delete_customer', customer_id=customer.id) }}"
+                                  onsubmit="return confirm('Are you sure you want to delete {{ customer.name }}? This will also delete their payment history.');">
+
+                                <button type="submit"
+                                        class="delete-btn">
+
+                                    🗑 Delete
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <tr>
+
+                    <td colspan="16"
+                        class="empty-message">
+
+                        No active monthly customers found.
+
+                    </td>
+
+                </tr>
+
+
+            {% endif %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+</div>
+
+</body>
+
+</html>

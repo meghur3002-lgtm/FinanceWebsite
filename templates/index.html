@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Finance Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body class="selection-page">
+
+    <div class="selection-container">
+
+        <h1>Finance Management</h1>
+
+        <p class="subtitle">
+            Select Payment Type
+        </p>
+
+
+        <div class="payment-options">
+
+            <a href="/weekly"
+               class="payment-card weekly-card">
+
+                <div class="payment-icon">
+                    📅
+                </div>
+
+                <h2>Weekly Payment</h2>
+
+                <p>
+                    Manage customers who make
+                    payments every week.
+                </p>
+
+                <span class="select-button">
+                    Open Weekly →
+                </span>
+
+            </a>
+
+
+            <a href="/monthly"
+               class="payment-card monthly-card">
+
+                <div class="payment-icon">
+                    🗓️
+                </div>
+
+                <h2>Monthly Payment</h2>
+
+                <p>
+                    Manage customers who make
+                    payments every month.
+                </p>
+
+                <span class="select-button">
+                    Open Monthly →
+                </span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
