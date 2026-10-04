@@ -887,3 +887,456 @@ body {
         text-align: center;
     }
 }
+/* ============================= */
+/* PAYMENT PAGE */
+/* ============================= */
+
+.payment-summary {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card span {
+    display: block;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.summary-card strong {
+    font-size: 20px;
+    color: #333;
+}
+
+.remaining-card strong {
+    color: #d9367b;
+}
+
+.form-card {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    max-width: 700px;
+    margin: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.form-card h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    color: #777;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+@media (max-width: 900px) {
+
+    .payment-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .payment-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+}
+/* =========================================================
+   QUICK PAYMENT TICK
+   ========================================================= */
+
+.quick-pay-btn {
+
+    border: none;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    padding: 6px 12px;
+
+    color: #d9367b;
+
+    transition: transform 0.15s ease;
+
+}
+
+
+.quick-pay-btn:hover {
+
+    transform: scale(1.25);
+
+}
+
+
+.quick-pay-btn:active {
+
+    transform: scale(0.95);
+
+}
+
+
+/* =========================================================
+   PAID TICK
+   ========================================================= */
+
+.paid {
+
+    display: inline-block;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    color: #2e9d5b;
+
+}
+
+
+/* =========================================================
+   INSTALLMENT CELL
+   ========================================================= */
+
+.installment-cell {
+
+    text-align: center;
+
+    min-width: 55px;
+
+}
+
+
+/* =========================================================
+   TOTAL RECEIVED ROW
+   ========================================================= */
+
+.collection-total-row {
+
+    font-weight: bold;
+
+    background: #f8f8f8;
+
+}
+
+
+.collection-total-row td {
+
+    padding: 12px;
+
+}
+
+
+/* =========================================================
+   PAYMENT HISTORY / SUMMARY
+   ========================================================= */
+
+.payment-summary {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.summary-card {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 18px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.08);
+
+}
+
+
+.summary-card span {
+
+    display: block;
+
+    color: #666;
+
+    font-size: 14px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.summary-card strong {
+
+    font-size: 20px;
+
+    color: #333;
+
+}
+
+
+.remaining-card strong {
+
+    color: #d9367b;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .payment-summary {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+/* =========================================================
+   ACTUAL PAYMENT CELL
+========================================================= */
+
+.payment-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 65px;
+}
+
+.payment-amount {
+    color: #315f7d;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.payment-date {
+    color: #718391;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   PAYMENT BUTTON
+========================================================= */
+
+.quick-pay-btn {
+
+    border: none;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    padding: 5px 10px;
+
+    color: #d9367b;
+
+    transition: transform 0.15s ease;
+
+}
+
+.quick-pay-btn:hover {
+
+    transform: scale(1.25);
+
+}
+
+.quick-pay-btn:active {
+
+    transform: scale(0.95);
+
+}
+
+
+/* =========================================================
+   COMPLETED MARK
+========================================================= */
+
+.completed-mark {
+
+    color: #2e9d5b;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+}
+/* =========================================================
+   PAYMENT CELLS
+========================================================= */
+
+.installment-cell {
+    min-width: 75px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+.payment-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 65px;
+}
+
+
+.payment-amount {
+    color: #315f7d;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+
+.payment-date {
+    color: #718391;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   PAYMENT BUTTON
+========================================================= */
+
+.quick-pay-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 5px 10px;
+    color: #d9367b;
+    transition: transform 0.15s ease;
+}
+
+
+.quick-pay-btn:hover {
+    transform: scale(1.25);
+}
+
+
+.quick-pay-btn:active {
+    transform: scale(0.95);
+}
+
+
+/* =========================================================
+   LOCKED FUTURE WEEK / MONTH
+========================================================= */
+
+.locked-installment {
+    color: #b8b8b8;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   COMPLETED PAYMENT
+========================================================= */
+
+.completed-mark {
+    color: #2e9d5b;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   FLASH MESSAGE
+========================================================= */
+
+.flash-messages {
+    margin: 15px 0;
+}
+
+
+.flash-message {
+    background: #fff0f6;
+    border: 1px solid #f3b6cf;
+    color: #b20f55;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}

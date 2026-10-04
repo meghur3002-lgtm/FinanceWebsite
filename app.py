@@ -1,721 +1,1052 @@
-from flask import Flask, render_template, request, redirect
-from database import get_connection
+from flask import Flask, render_template, request, redirect, url_for, flash
+from database import get_connection, initialize_database
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import os
+
 
 app = Flask(__name__)
+app.secret_key = "finance-management-secret-key"
+
+INDIA_TIMEZONE = ZoneInfo("Asia/Kolkata")
 
 
-# =========================================================
-# HOME PAGE
-# =========================================================
+# ============================================================
+# DATE FILTER
+# ============================================================
+
+@app.template_filter("display_date")
+def display_date(value):
+
+    if not value:
+        return ""
+
+    try:
+
+        return datetime.strptime(
+            str(value),
+            "%Y-%m-%d"
+        ).strftime("%d-%m-%Y")
+
+    except (ValueError, TypeError):
+
+        return value
+
+
+# ============================================================
+# HOME
+# ============================================================
 
 @app.route("/")
-def home():
+def index():
 
-    return render_template("index.html")
+    conn = get_connection()
+
+    customers = conn.execute("""
+        SELECT *
+        FROM customers
+        ORDER BY id DESC
+    """).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "index.html",
+        customers=customers
+    )
 
 
-# =========================================================
-# WEEKLY LEDGER
-# =========================================================
+# ============================================================
+# WEEKLY
+# ============================================================
 
 @app.route("/weekly")
 def weekly():
 
-    connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    conn = get_connection()
 
-    cursor.execute("""
-        SELECT
-            c.id,
-            c.name,
-            c.phone,
-            c.amount_taken,
-            c.start_date,
-            c.payment_type,
-            c.payment_amount,
+    customer_rows = conn.execute("""
+        SELECT *
+        FROM customers
+        WHERE payment_type = 'Weekly'
+        ORDER BY id DESC
+    """).fetchall()
 
-            COALESCE(SUM(p.amount_paid), 0) AS total_paid,
+    customers = []
 
-            c.amount_taken -
-            COALESCE(SUM(p.amount_paid), 0) AS remaining_amount,
+    # ========================================================
+    # CHANGED:
+    # Previously limited to Week 1 - Week 10.
+    # Now the highest week is taken from the database.
+    # ========================================================
 
-            COUNT(p.id) AS payment_count
-
-        FROM customers c
-
-        LEFT JOIN payments p
+    result = conn.execute("""
+        SELECT COALESCE(
+            MAX(p.installment_number),
+            0
+        )
+        FROM payments p
+        INNER JOIN customers c
             ON c.id = p.customer_id
-
         WHERE c.payment_type = 'Weekly'
-        AND c.status = 'Active'
+    """).fetchone()
 
-        GROUP BY
-            c.id,
-            c.name,
-            c.phone,
-            c.amount_taken,
-            c.start_date,
-            c.payment_type,
-            c.payment_amount
+    highest_payment_week = int(
+        result[0] or 0
+    )
 
-        ORDER BY c.id DESC
-    """)
+    weeks = list(
+        range(
+            1,
+            highest_payment_week + 2
+        )
+    )
 
-    customers = cursor.fetchall()
+    if not weeks:
+        weeks = [1]
 
+    weekly_totals = {
+        week: 0
+        for week in weeks
+    }
 
-    # Get individual payments for every customer
+    for customer in customer_rows:
 
-    for customer in customers:
+        customer_data = dict(customer)
 
-        cursor.execute("""
-            SELECT
-                installment_number,
-                payment_date,
-                amount_paid,
-                payment_method,
-                notes
+        customer_id = customer["id"]
 
+        payments = conn.execute("""
+            SELECT *
             FROM payments
-
-            WHERE customer_id = %s
-
+            WHERE customer_id = ?
             ORDER BY installment_number ASC
-        """, (customer["id"],))
+        """, (customer_id,)).fetchall()
 
-        customer["payments"] = cursor.fetchall()
+        customer_data["payments"] = payments
 
+        total_paid = sum(
+            float(payment["amount_paid"] or 0)
+            for payment in payments
+        )
 
-    cursor.close()
-    connection.close()
+        customer_data["total_paid"] = total_paid
 
+        total_amount = float(
+            customer["total_amount"] or 0
+        )
+
+        remaining_amount = max(
+            total_amount - total_paid,
+            0
+        )
+
+        customer_data["remaining_amount"] = remaining_amount
+
+        if remaining_amount <= 0:
+
+            customer_data["display_status"] = "Completed"
+
+        else:
+
+            customer_data["display_status"] = customer["status"]
+
+        # ====================================================
+        # CHANGED:
+        # Removed the <= 10 restriction.
+        # Payments can now belong to ANY week.
+        # ====================================================
+
+        for payment in payments:
+
+            installment = int(
+                payment["installment_number"]
+            )
+
+            if installment not in weekly_totals:
+
+                weekly_totals[installment] = 0
+
+            weekly_totals[installment] += float(
+                payment["amount_paid"] or 0
+            )
+
+        customers.append(customer_data)
+
+    # ========================================================
+    # CHANGED:
+    # Create Week 1 through the highest week + 1.
+    # ========================================================
+
+    highest_week = max(
+        weekly_totals.keys(),
+        default=1
+    )
+
+    weeks = list(
+        range(
+            1,
+            highest_week + 2
+        )
+    )
+
+    conn.close()
 
     return render_template(
         "weekly.html",
-        customers=customers
+        customers=customers,
+        weekly_totals=weekly_totals,
+        weeks=weeks
     )
 
 
-# =========================================================
-# MONTHLY LEDGER
-# =========================================================
+# ============================================================
+# MONTHLY
+# ============================================================
 
 @app.route("/monthly")
 def monthly():
 
-    connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    conn = get_connection()
 
-    cursor.execute("""
-        SELECT
-            c.id,
-            c.name,
-            c.phone,
-            c.amount_taken,
-            c.start_date,
-            c.payment_type,
-            c.payment_amount,
+    customer_rows = conn.execute("""
+        SELECT *
+        FROM customers
+        WHERE payment_type = 'Monthly'
+        ORDER BY id DESC
+    """).fetchall()
 
-            COALESCE(SUM(p.amount_paid), 0) AS total_paid,
+    customers = []
 
-            c.amount_taken -
-            COALESCE(SUM(p.amount_paid), 0) AS remaining_amount,
-
-            COUNT(p.id) AS payment_count
-
-        FROM customers c
-
-        LEFT JOIN payments p
+    result = conn.execute("""
+        SELECT COALESCE(
+            MAX(p.installment_number),
+            0
+        )
+        FROM payments p
+        INNER JOIN customers c
             ON c.id = p.customer_id
-
         WHERE c.payment_type = 'Monthly'
-        AND c.status = 'Active'
+    """).fetchone()
 
-        GROUP BY
-            c.id,
-            c.name,
-            c.phone,
-            c.amount_taken,
-            c.start_date,
-            c.payment_type,
-            c.payment_amount
+    highest_payment_month = int(result[0] or 0)
 
-        ORDER BY c.id DESC
-    """)
+    months = list(
+        range(
+            1,
+            highest_payment_month + 2
+        )
+    )
 
-    customers = cursor.fetchall()
+    if not months:
+        months = [1]
 
+    monthly_totals = {
+        month: 0
+        for month in months
+    }
 
-    # Get individual payments for every customer
+    for customer in customer_rows:
 
-    for customer in customers:
+        customer_data = dict(customer)
 
-        cursor.execute("""
-            SELECT
-                installment_number,
-                payment_date,
-                amount_paid,
-                payment_method,
-                notes
+        customer_id = customer["id"]
 
+        payments = conn.execute("""
+            SELECT *
             FROM payments
-
-            WHERE customer_id = %s
-
+            WHERE customer_id = ?
             ORDER BY installment_number ASC
-        """, (customer["id"],))
+        """, (customer_id,)).fetchall()
 
-        customer["payments"] = cursor.fetchall()
+        customer_data["payments"] = payments
 
+        # Total paid
+        total_paid = sum(
+            float(payment["amount_paid"] or 0)
+            for payment in payments
+        )
 
-    cursor.close()
-    connection.close()
+        customer_data["total_paid"] = total_paid
 
+        # Principal paid
+        total_principal_paid = sum(
+            float(payment["principal_paid"] or 0)
+            for payment in payments
+        )
+
+        customer_data["total_principal_paid"] = (
+            total_principal_paid
+        )
+
+        # Interest paid
+        total_interest_paid = sum(
+            float(payment["interest_paid"] or 0)
+            for payment in payments
+        )
+
+        customer_data["total_interest_paid"] = (
+            total_interest_paid
+        )
+
+        # Original amount
+        amount_taken = float(
+            customer["amount_taken"] or 0
+        )
+
+        # Remaining principal
+        remaining_principal = max(
+            amount_taken - total_principal_paid,
+            0
+        )
+
+        customer_data["remaining_principal"] = (
+            remaining_principal
+        )
+
+        customer_data["remaining_amount"] = (
+            remaining_principal
+        )
+
+        # Fixed monthly interest from ORIGINAL amount
+        interest_rate = float(
+            customer["interest_rate"] or 0
+        )
+
+        monthly_interest = (
+            amount_taken
+            * interest_rate
+            / 100
+        )
+
+        if remaining_principal <= 0:
+
+            monthly_interest = 0
+
+        customer_data["monthly_interest"] = (
+            monthly_interest
+        )
+
+        # Payment amount is only used as optional
+        # scheduled information.
+        scheduled_payment = float(
+            customer["payment_amount"] or 0
+        )
+
+        customer_data["scheduled_payment"] = (
+            scheduled_payment
+        )
+
+        if remaining_principal <= 0:
+
+            customer_data["display_status"] = "Completed"
+
+        else:
+
+            customer_data["display_status"] = customer["status"]
+
+        # Monthly totals
+        for payment in payments:
+
+            installment = int(
+                payment["installment_number"]
+            )
+
+            if installment not in monthly_totals:
+
+                monthly_totals[installment] = 0
+
+            monthly_totals[installment] += float(
+                payment["amount_paid"] or 0
+            )
+
+        customers.append(customer_data)
+
+    highest_month = max(
+        monthly_totals.keys(),
+        default=1
+    )
+
+    months = list(
+        range(
+            1,
+            highest_month + 2
+        )
+    )
+
+    conn.close()
 
     return render_template(
         "monthly.html",
-        customers=customers
+        customers=customers,
+        monthly_totals=monthly_totals,
+        months=months
     )
 
 
-# =========================================================
-# ADD CUSTOMER
-# =========================================================
+# ============================================================
+# RECORD PAYMENT
+# ============================================================
 
-@app.route("/add-customer", methods=["GET", "POST"])
-def add_customer():
+@app.route(
+    "/record-payment/<int:customer_id>/<int:installment_number>",
+    methods=["POST"]
+)
+def record_payment(
+    customer_id,
+    installment_number
+):
 
-    # Show form
+    conn = get_connection()
 
-    if request.method == "GET":
+    customer = conn.execute("""
+        SELECT *
+        FROM customers
+        WHERE id = ?
+    """, (customer_id,)).fetchone()
 
-        return render_template("add_customer.html")
+    if not customer:
 
+        conn.close()
 
-    # Get form values
+        flash(
+            "Customer not found.",
+            "error"
+        )
 
-    name = request.form.get("name")
-
-    phone = request.form.get("phone")
-
-    amount_taken = request.form.get("amount_taken")
-
-    start_date = request.form.get("start_date")
-
-    payment_type = request.form.get("payment_type")
-
-    payment_amount = request.form.get("payment_amount")
-
-
-    # Validate name
-
-    if not name:
-
-        return "Customer name is required."
-
-
-    # Validate amount
-
-    if not amount_taken:
-
-        return "Amount taken is required."
-
-
-    # Validate starting date
-
-    if not start_date:
-
-        return "Starting date is required."
-
-
-    # Validate payment type
-
-    if payment_type not in ["Weekly", "Monthly"]:
-
-        return "Please select Weekly or Monthly."
-
-
-    # Validate payment amount
-
-    if not payment_amount:
-
-        return "Payment amount is required."
-
-
-    connection = None
-    cursor = None
-
+        return redirect(url_for("index"))
 
     try:
 
-        connection = get_connection()
+        payment_amount = float(
+            request.form.get(
+                "amount_paid",
+                0
+            )
+        )
 
-        cursor = connection.cursor()
+    except (ValueError, TypeError):
+
+        conn.close()
+
+        flash(
+            "Invalid payment amount.",
+            "error"
+        )
+
+        return redirect(
+            request.referrer or url_for("index")
+        )
+
+    if payment_amount <= 0:
+
+        conn.close()
+
+        flash(
+            "Payment amount must be greater than zero.",
+            "error"
+        )
+
+        return redirect(
+            request.referrer or url_for("index")
+        )
+
+    payment_date = datetime.now(
+        INDIA_TIMEZONE
+    ).strftime("%Y-%m-%d")
+
+    payment_method = request.form.get(
+        "payment_method",
+        "Cash"
+    )
+
+    notes = request.form.get(
+        "notes",
+        ""
+    )
+
+    # ========================================================
+    # MONTHLY
+    # ========================================================
+
+    if customer["payment_type"] == "Monthly":
+
+        total_payment_entered = payment_amount
+
+        result = conn.execute("""
+            SELECT COALESCE(
+                SUM(principal_paid),
+                0
+            )
+            FROM payments
+            WHERE customer_id = ?
+        """, (customer_id,)).fetchone()
+
+        principal_paid_before = float(
+            result[0] or 0
+        )
+
+        amount_taken = float(
+            customer["amount_taken"] or 0
+        )
+
+        remaining_principal = max(
+            amount_taken - principal_paid_before,
+            0
+        )
+
+        if remaining_principal <= 0:
+
+            conn.close()
+
+            flash(
+                "This customer has already completed payment.",
+                "error"
+            )
+
+            return redirect(
+                url_for("monthly")
+            )
+
+        interest_rate = float(
+            customer["interest_rate"] or 0
+        )
+
+        monthly_interest = (
+            amount_taken
+            * interest_rate
+            / 100
+        )
+
+        # Interest is paid first
+        if total_payment_entered >= monthly_interest:
+
+            interest_paid = monthly_interest
+
+            principal_paid = (
+                total_payment_entered
+                - monthly_interest
+            )
+
+        else:
+
+            interest_paid = total_payment_entered
+
+            principal_paid = 0
+
+        # Do not allow principal to exceed remaining amount
+        if principal_paid > remaining_principal:
+
+            principal_paid = remaining_principal
+
+        actual_total_payment = (
+            principal_paid
+            + interest_paid
+        )
+
+        remaining_after_payment = max(
+            remaining_principal
+            - principal_paid,
+            0
+        )
+
+        conn.execute("""
+            INSERT INTO payments (
+                customer_id,
+                installment_number,
+                payment_date,
+                amount_paid,
+                principal_paid,
+                interest_paid,
+                payment_method,
+                notes
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            customer_id,
+            installment_number,
+            payment_date,
+            actual_total_payment,
+            principal_paid,
+            interest_paid,
+            payment_method,
+            notes
+        ))
+
+        if remaining_after_payment <= 0:
+
+            conn.execute("""
+                UPDATE customers
+                SET status = 'Completed'
+                WHERE id = ?
+            """, (customer_id,))
+
+        else:
+
+            conn.execute("""
+                UPDATE customers
+                SET status = 'Active'
+                WHERE id = ?
+            """, (customer_id,))
+
+        conn.commit()
+        conn.close()
+
+        flash(
+            f"Payment ₹{actual_total_payment:.2f} recorded. "
+            f"Interest: ₹{interest_paid:.2f}, "
+            f"Principal: ₹{principal_paid:.2f}, "
+            f"Remaining Principal: ₹{remaining_after_payment:.2f}.",
+            "success"
+        )
+
+        return redirect(
+            url_for("monthly")
+        )
+
+    # ========================================================
+    # WEEKLY
+    # ========================================================
+
+    else:
+
+        result = conn.execute("""
+            SELECT COALESCE(
+                SUM(amount_paid),
+                0
+            )
+            FROM payments
+            WHERE customer_id = ?
+        """, (customer_id,)).fetchone()
+
+        total_paid = float(
+            result[0] or 0
+        )
+
+        total_amount = float(
+            customer["total_amount"] or 0
+        )
+
+        remaining_amount = max(
+            total_amount - total_paid,
+            0
+        )
+
+        if remaining_amount <= 0:
+
+            conn.close()
+
+            flash(
+                "This customer has already completed payment.",
+                "error"
+            )
+
+            return redirect(
+                url_for("weekly")
+            )
+
+        actual_payment = min(
+            payment_amount,
+            remaining_amount
+        )
+
+        conn.execute("""
+            INSERT INTO payments (
+                customer_id,
+                installment_number,
+                payment_date,
+                amount_paid,
+                principal_paid,
+                interest_paid,
+                payment_method,
+                notes
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            customer_id,
+            installment_number,
+            payment_date,
+            actual_payment,
+            actual_payment,
+            0,
+            payment_method,
+            notes
+        ))
+
+        new_total = (
+            total_paid + actual_payment
+        )
+
+        if new_total >= total_amount:
+
+            conn.execute("""
+                UPDATE customers
+                SET status = 'Completed'
+                WHERE id = ?
+            """, (customer_id,))
+
+        else:
+
+            conn.execute("""
+                UPDATE customers
+                SET status = 'Active'
+                WHERE id = ?
+            """, (customer_id,))
+
+        conn.commit()
+        conn.close()
+
+        flash(
+            f"Payment of ₹{actual_payment:.2f} recorded successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for("weekly")
+        )
 
 
-        cursor.execute("""
-            INSERT INTO customers
-            (
+# ============================================================
+# ADD CUSTOMER
+# ============================================================
+
+@app.route(
+    "/add-customer",
+    methods=["GET", "POST"]
+)
+def add_customer():
+
+    if request.method == "POST":
+
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        phone = request.form.get(
+            "phone",
+            ""
+        ).strip()
+
+        start_date = request.form.get(
+            "start_date",
+            ""
+        )
+
+        payment_type = request.form.get(
+            "payment_type",
+            ""
+        )
+
+        try:
+
+            amount_taken = float(
+                request.form.get(
+                    "amount_taken",
+                    0
+                )
+            )
+
+        except (ValueError, TypeError):
+
+            amount_taken = 0
+
+        try:
+
+            interest_rate = float(
+                request.form.get(
+                    "interest_rate",
+                    0
+                )
+            )
+
+        except (ValueError, TypeError):
+
+            interest_rate = 0
+
+        payment_amount_text = request.form.get(
+            "payment_amount",
+            ""
+        ).strip()
+
+        if payment_amount_text:
+
+            try:
+
+                payment_amount = float(
+                    payment_amount_text
+                )
+
+            except (ValueError, TypeError):
+
+                payment_amount = 0
+
+        else:
+
+            payment_amount = 0
+
+        # ----------------------------------------------------
+        # VALIDATION
+        # ----------------------------------------------------
+
+        if not name:
+
+            flash(
+                "Customer name is required.",
+                "error"
+            )
+
+            return redirect(
+                url_for("add_customer")
+            )
+
+        if amount_taken <= 0:
+
+            flash(
+                "Amount taken must be greater than zero.",
+                "error"
+            )
+
+            return redirect(
+                url_for("add_customer")
+            )
+
+        if interest_rate < 0:
+
+            flash(
+                "Interest rate cannot be negative.",
+                "error"
+            )
+
+            return redirect(
+                url_for("add_customer")
+            )
+
+        if not payment_type:
+
+            flash(
+                "Please select Weekly or Monthly.",
+                "error"
+            )
+
+            return redirect(
+                url_for("add_customer")
+            )
+
+        if payment_amount < 0:
+
+            flash(
+                "Payment amount cannot be negative.",
+                "error"
+            )
+
+            return redirect(
+                url_for("add_customer")
+            )
+
+        if not start_date:
+
+            start_date = datetime.now(
+                INDIA_TIMEZONE
+            ).strftime("%Y-%m-%d")
+
+        # ====================================================
+        # MONTHLY
+        # ====================================================
+
+        if payment_type == "Monthly":
+
+            total_amount = amount_taken
+
+            # Optional
+            if payment_amount <= 0:
+
+                payment_amount = 0
+
+        # ====================================================
+        # WEEKLY
+        # ====================================================
+
+        else:
+
+            if payment_amount <= 0:
+
+                flash(
+                    "Please enter the Weekly payment amount.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("add_customer")
+                )
+
+            interest_amount = (
+                amount_taken
+                * interest_rate
+                / 100
+            )
+
+            total_amount = (
+                amount_taken
+                + interest_amount
+            )
+
+        # ----------------------------------------------------
+        # INSERT
+        # ----------------------------------------------------
+
+        conn = get_connection()
+
+        conn.execute("""
+            INSERT INTO customers (
                 name,
                 phone,
                 amount_taken,
+                interest_rate,
+                total_amount,
                 start_date,
                 payment_type,
                 payment_amount,
                 status
             )
-
-            VALUES
-            (
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                'Active'
-            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             name,
             phone,
             amount_taken,
+            interest_rate,
+            total_amount,
             start_date,
             payment_type,
-            payment_amount
+            payment_amount,
+            "Active"
         ))
 
-
-        connection.commit()
-
-
-    except Exception as error:
-
-        return f"""
-        <html>
-
-        <body style="font-family:Arial;padding:40px;">
-
-            <h2>Database Error</h2>
-
-            <p>{error}</p>
-
-            <br>
-
-            <a href="/add-customer">
-                ← Go Back
-            </a>
-
-        </body>
-
-        </html>
-        """
-
-
-    finally:
-
-        if cursor:
-
-            cursor.close()
-
-
-        if connection:
-
-            connection.close()
-
-
-    # Redirect to correct ledger
-
-    if payment_type == "Weekly":
-
-        return redirect("/weekly")
-
-
-    return redirect("/monthly")
-
-
-# =========================================================
-# ADD PAYMENT
-# =========================================================
-
-@app.route("/add-payment/<int:customer_id>", methods=["GET", "POST"])
-def add_payment(customer_id):
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-
-
-    # Get customer
-
-    cursor.execute("""
-        SELECT
-            id,
-            name,
-            amount_taken,
-            payment_type,
-            payment_amount
-
-        FROM customers
-
-        WHERE id = %s
-    """, (customer_id,))
-
-
-    customer = cursor.fetchone()
-
-
-    if not customer:
-
-        cursor.close()
-
-        connection.close()
-
-        return "Customer not found."
-
-
-    # Get total paid
-
-    cursor.execute("""
-        SELECT
-            COALESCE(SUM(amount_paid), 0) AS total_paid
-
-        FROM payments
-
-        WHERE customer_id = %s
-    """, (customer_id,))
-
-
-    payment_summary = cursor.fetchone()
-
-
-    total_paid = float(
-        payment_summary["total_paid"] or 0
-    )
-
-
-    # Calculate remaining
-
-    remaining_amount = (
-        float(customer["amount_taken"])
-        - total_paid
-    )
-
-
-    # =====================================================
-    # SAVE PAYMENT
-    # =====================================================
-
-    if request.method == "POST":
-
-        payment_date = request.form.get("payment_date")
-
-        amount_paid = request.form.get("amount_paid")
-
-        payment_method = request.form.get("payment_method")
-
-        notes = request.form.get("notes")
-
-
-        # Validate payment date
-
-        if not payment_date:
-
-            cursor.close()
-
-            connection.close()
-
-            return "Payment date is required."
-
-
-        # Validate payment amount
-
-        if not amount_paid:
-
-            cursor.close()
-
-            connection.close()
-
-            return "Payment amount is required."
-
-
-        # Validate payment method
-
-        if payment_method not in ["Cash", "Online"]:
-
-            cursor.close()
-
-            connection.close()
-
-            return "Please select Cash or Online."
-
-
-        # Convert amount
-
-        try:
-
-            amount_paid = float(amount_paid)
-
-        except ValueError:
-
-            cursor.close()
-
-            connection.close()
-
-            return "Invalid payment amount."
-
-
-        # Payment must be positive
-
-        if amount_paid <= 0:
-
-            cursor.close()
-
-            connection.close()
-
-            return "Payment amount must be greater than zero."
-
-
-        # Cannot pay more than remaining amount
-
-        if amount_paid > remaining_amount:
-
-            cursor.close()
-
-            connection.close()
-
-            return f"""
-            <html>
-
-            <body style="font-family:Arial;padding:40px;">
-
-                <h2>Payment Error</h2>
-
-                <p>
-                    Payment cannot be greater than
-                    the remaining amount.
-                </p>
-
-                <p>
-                    Remaining amount:
-                    ₹{remaining_amount:.2f}
-                </p>
-
-                <br>
-
-                <a href="/add-payment/{customer_id}">
-                    ← Go Back
-                </a>
-
-            </body>
-
-            </html>
-            """
-
-
-        # =================================================
-        # FIND NEXT INSTALLMENT NUMBER
-        # =================================================
-
-        cursor.execute("""
-            SELECT
-                COALESCE(
-                    MAX(installment_number),
-                    0
-                ) + 1 AS next_installment
-
-            FROM payments
-
-            WHERE customer_id = %s
-        """, (customer_id,))
-
-
-        installment_data = cursor.fetchone()
-
-
-        installment_number = (
-            installment_data["next_installment"]
+        conn.commit()
+        conn.close()
+
+        flash(
+            "Customer added successfully.",
+            "success"
         )
 
+        if payment_type == "Monthly":
 
-        # =================================================
-        # INSERT PAYMENT
-        # =================================================
-
-        cursor.execute("""
-            INSERT INTO payments
-            (
-                customer_id,
-                installment_number,
-                payment_date,
-                amount_paid,
-                payment_method,
-                notes
+            return redirect(
+                url_for("monthly")
             )
 
-            VALUES
-            (
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s
-            )
-        """, (
-            customer_id,
-            installment_number,
-            payment_date,
-            amount_paid,
-            payment_method,
-            notes
-        ))
-
-
-        # Calculate new total
-
-        new_total_paid = (
-            total_paid + amount_paid
+        return redirect(
+            url_for("weekly")
         )
-
-
-        # Calculate new remaining
-
-        new_remaining = (
-            float(customer["amount_taken"])
-            - new_total_paid
-        )
-
-
-        # =================================================
-        # MARK CUSTOMER COMPLETED
-        # =================================================
-
-        if new_remaining <= 0:
-
-            cursor.execute("""
-                UPDATE customers
-
-                SET status = 'Completed'
-
-                WHERE id = %s
-            """, (customer_id,))
-
-
-        # Save everything
-
-        connection.commit()
-
-
-        payment_type = customer["payment_type"]
-
-
-        cursor.close()
-
-        connection.close()
-
-
-        # Redirect to ledger
-
-        if payment_type == "Weekly":
-
-            return redirect("/weekly")
-
-
-        return redirect("/monthly")
-
-
-    # =====================================================
-    # SHOW PAYMENT FORM
-    # =====================================================
-
-    cursor.close()
-
-    connection.close()
-
 
     return render_template(
-        "add_payment.html",
-        customer=customer,
-        total_paid=total_paid,
-        remaining_amount=remaining_amount
+        "add_customer.html"
     )
 
 
-# =========================================================
+# ============================================================
 # PAYMENT HISTORY
-# =========================================================
+# ============================================================
 
-@app.route("/payment-history/<int:customer_id>")
+@app.route(
+    "/payment-history/<int:customer_id>"
+)
 def payment_history(customer_id):
 
-    connection = get_connection()
+    conn = get_connection()
 
-    cursor = connection.cursor(dictionary=True)
-
-
-    # Get customer
-
-    cursor.execute("""
-        SELECT
-            id,
-            name,
-            amount_taken,
-            payment_type
-
+    customer = conn.execute("""
+        SELECT *
         FROM customers
-
-        WHERE id = %s
-    """, (customer_id,))
-
-
-    customer = cursor.fetchone()
-
+        WHERE id = ?
+    """, (customer_id,)).fetchone()
 
     if not customer:
 
-        cursor.close()
+        conn.close()
 
-        connection.close()
+        flash(
+            "Customer not found.",
+            "error"
+        )
 
-        return "Customer not found."
+        return redirect(
+            url_for("index")
+        )
 
-
-    # Get payment history
-
-    cursor.execute("""
-        SELECT
-            installment_number,
-            payment_date,
-            amount_paid,
-            payment_method,
-            notes
-
+    payments = conn.execute("""
+        SELECT *
         FROM payments
-
-        WHERE customer_id = %s
-
+        WHERE customer_id = ?
         ORDER BY installment_number ASC
-    """, (customer_id,))
+    """, (customer_id,)).fetchall()
 
+    total_paid = sum(
+        float(payment["amount_paid"] or 0)
+        for payment in payments
+    )
 
-    payments = cursor.fetchall()
+    total_principal_paid = sum(
+        float(payment["principal_paid"] or 0)
+        for payment in payments
+    )
 
+    total_interest_paid = sum(
+        float(payment["interest_paid"] or 0)
+        for payment in payments
+    )
 
-    cursor.close()
+    amount_taken = float(
+        customer["amount_taken"] or 0
+    )
 
-    connection.close()
+    remaining_principal = max(
+        amount_taken - total_principal_paid,
+        0
+    )
 
+    interest_rate = float(
+        customer["interest_rate"] or 0
+    )
+
+    if customer["payment_type"] == "Monthly":
+
+        current_monthly_interest = (
+            amount_taken
+            * interest_rate
+            / 100
+            if remaining_principal > 0
+            else 0
+        )
+
+    else:
+
+        current_monthly_interest = (
+            remaining_principal
+            * interest_rate
+            / 100
+            if remaining_principal > 0
+            else 0
+        )
+
+    conn.close()
 
     return render_template(
         "payment_history.html",
         customer=customer,
-        payments=payments
+        payments=payments,
+        total_paid=total_paid,
+        total_principal_paid=total_principal_paid,
+        total_interest_paid=total_interest_paid,
+        remaining_principal=remaining_principal,
+        current_monthly_interest=current_monthly_interest
     )
 
 
-# =========================================================
+# ============================================================
 # DELETE CUSTOMER
-# =========================================================
+# ============================================================
 
 @app.route(
     "/delete-customer/<int:customer_id>",
@@ -723,110 +1054,78 @@ def payment_history(customer_id):
 )
 def delete_customer(customer_id):
 
-    connection = None
+    conn = get_connection()
 
-    cursor = None
+    customer = conn.execute("""
+        SELECT *
+        FROM customers
+        WHERE id = ?
+    """, (customer_id,)).fetchone()
 
+    if not customer:
 
-    try:
+        conn.close()
 
-        connection = get_connection()
+        flash(
+            "Customer not found.",
+            "error"
+        )
 
-        cursor = connection.cursor()
+        return redirect(
+            url_for("index")
+        )
 
+    conn.execute("""
+        DELETE FROM payments
+        WHERE customer_id = ?
+    """, (customer_id,))
 
-        # Delete customer
+    conn.execute("""
+        DELETE FROM customers
+        WHERE id = ?
+    """, (customer_id,))
 
-        # Because the database uses
-        # ON DELETE CASCADE,
-        # all payment records belonging
-        # to this customer will also be deleted.
+    conn.commit()
+    conn.close()
 
-        cursor.execute("""
-            DELETE FROM customers
+    flash(
+        "Customer deleted successfully.",
+        "success"
+    )
 
-            WHERE id = %s
-        """, (customer_id,))
+    if customer["payment_type"] == "Monthly":
 
-
-        connection.commit()
-
-
-    except Exception as error:
-
-        # Undo changes if something goes wrong
-
-        if connection:
-
-            connection.rollback()
-
-
-        return f"""
-        <html>
-
-        <head>
-
-            <title>Delete Error</title>
-
-        </head>
-
-        <body
-            style="
-                font-family:Arial;
-                padding:40px;
-                background:#fff5f8;
-            "
-        >
-
-            <h2>
-                Delete Error
-            </h2>
-
-
-            <p>
-                {error}
-            </p>
-
-
-            <br>
-
-
-            <a href="/">
-                ← Back to Home
-            </a>
-
-        </body>
-
-        </html>
-        """
-
-
-    finally:
-
-        if cursor:
-
-            cursor.close()
-
-
-        if connection:
-
-            connection.close()
-
-
-    # Return to the page from which
-    # the delete button was clicked
+        return redirect(
+            url_for("monthly")
+        )
 
     return redirect(
-        request.referrer or "/"
+        url_for("weekly")
     )
 
 
-# =========================================================
-# START FLASK SERVER
-# =========================================================
+# ============================================================
+# DATABASE
+# ============================================================
+
+initialize_database()
+
+
+# ============================================================
+# RUN
+# ============================================================
 
 if __name__ == "__main__":
 
+    port = int(
+        os.environ.get(
+            "PORT",
+            5000
+        )
+    )
+
     app.run(
+        host="0.0.0.0",
+        port=port,
         debug=True
     )

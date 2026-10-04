@@ -1,64 +1,501 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Monthly Customers</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <title>Monthly Payments</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background: #eaf3ff;
+
+            color: #123;
+
+        }
+
+        .page {
+
+            padding: 25px;
+
+        }
+
+        .top-bar {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+
+        }
+
+        h1 {
+
+            margin: 0;
+
+            color: #1261a0;
+
+        }
+
+        .buttons {
+
+            display: flex;
+
+            gap: 10px;
+
+        }
+
+        .btn {
+
+            text-decoration: none;
+
+            padding: 11px 18px;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+
+            border: none;
+
+            cursor: pointer;
+
+            display: inline-block;
+
+        }
+
+        .add-btn {
+
+            background: #1261a0;
+
+            color: white;
+
+        }
+
+        .back-btn {
+
+            background: #d9eaff;
+
+            color: #1261a0;
+
+        }
+
+        .flash {
+
+            padding: 12px 15px;
+
+            margin-bottom: 15px;
+
+            border-radius: 8px;
+
+            background: #dff3e4;
+
+            color: #176b2c;
+
+            font-weight: bold;
+
+        }
+
+        .table-container {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+            background: white;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.08);
+
+        }
+
+        table {
+
+            border-collapse: collapse;
+
+            min-width: 1500px;
+
+            width: 100%;
+
+        }
+
+        th {
+
+            background: #1261a0;
+
+            color: white;
+
+            padding: 13px 12px;
+
+            text-align: center;
+
+            white-space: nowrap;
+
+        }
+
+        td {
+
+            padding: 12px;
+
+            border-bottom: 1px solid #e1e8ef;
+
+            text-align: center;
+
+            white-space: nowrap;
+
+            vertical-align: middle;
+
+        }
+
+        tr:hover {
+
+            background: #f5faff;
+
+        }
+
+        .customer-name {
+
+            font-weight: bold;
+
+            color: #1261a0;
+
+        }
+
+        .interest {
+
+            color: #c0392b;
+
+            font-weight: bold;
+
+        }
+
+        .principal {
+
+            color: #16803c;
+
+            font-weight: bold;
+
+        }
+
+        .remaining {
+
+            color: #b45309;
+
+            font-weight: bold;
+
+        }
+
+        .paid-box {
+
+            background: #e8f7ec;
+
+            border-radius: 8px;
+
+            padding: 8px;
+
+            min-width: 125px;
+
+        }
+
+        .paid-total {
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            color: #176b2c;
+
+        }
+
+        .paid-details {
+
+            font-size: 12px;
+
+            margin-top: 4px;
+
+            line-height: 1.5;
+
+        }
+
+        .payment-box {
+
+            background: #eef6ff;
+
+            border: 1px solid #bddcff;
+
+            border-radius: 8px;
+
+            padding: 8px;
+
+            min-width: 190px;
+
+        }
+
+        .payment-box input {
+
+            width: 140px;
+
+            padding: 8px;
+
+            border: 1px solid #a9c9e8;
+
+            border-radius: 6px;
+
+            text-align: center;
+
+            font-size: 14px;
+
+        }
+
+        .pay-btn {
+
+            margin-top: 7px;
+
+            background: #1261a0;
+
+            color: white;
+
+            border: none;
+
+            padding: 7px 14px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+        }
+
+        .pay-btn:hover {
+
+            background: #0d4d80;
+
+        }
+
+        .auto-interest {
+
+            color: #c0392b;
+
+            font-size: 12px;
+
+            margin-top: 5px;
+
+        }
+
+        .auto-info {
+
+            color: #555;
+
+            font-size: 11px;
+
+            margin-top: 3px;
+
+            margin-bottom: 5px;
+
+        }
+
+        .completed {
+
+            background: #e8f7ec;
+
+            color: #176b2c;
+
+            padding: 8px 12px;
+
+            border-radius: 7px;
+
+            font-weight: bold;
+
+        }
+
+        .action-btn {
+
+            display: block;
+
+            text-decoration: none;
+
+            margin: 4px auto;
+
+            padding: 7px 10px;
+
+            border-radius: 6px;
+
+            width: 120px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+        }
+
+        .history-btn {
+
+            background: #d9eaff;
+
+            color: #1261a0;
+
+        }
+
+        .delete-btn {
+
+            background: #ffe1e1;
+
+            color: #b42318;
+
+        }
+
+        .empty {
+
+            padding: 40px;
+
+            text-align: center;
+
+            color: #777;
+
+        }
+
+        .month-header {
+
+            background: #1976b8;
+
+        }
+
+        .payment-date {
+
+            font-size: 11px;
+
+            color: #666;
+
+            margin-top: 3px;
+
+        }
+
+        .small-label {
+
+            font-size: 11px;
+
+            color: #555;
+
+        }
+
+    </style>
+
 </head>
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}">
+
+
 <body>
 
-<div class="container">
 
-    <div class="page-header">
+<div class="page">
 
-        <div>
-            <h1>Monthly Customers</h1>
-            <p>Monthly payment collection ledger</p>
-        </div>
 
-        <div class="header-buttons">
-            <a href="/" class="btn secondary">Home</a>
-            <a href="/add-customer" class="btn primary">+ Add Customer</a>
-            <a href="/weekly" class="btn secondary">Weekly</a>
+    <!-- TOP BAR -->
+
+    <div class="top-bar">
+
+        <h1>
+            Monthly Payments
+        </h1>
+
+        <div class="buttons">
+
+            <a
+                href="{{ url_for('add_customer') }}"
+                class="btn add-btn"
+            >
+                + Add Customer
+            </a>
+
+            <a
+                href="{{ url_for('index') }}"
+                class="btn back-btn"
+            >
+                ← Back
+            </a>
+
         </div>
 
     </div>
 
 
+    <!-- FLASH MESSAGE -->
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="flash">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
     {% if customers %}
 
-    <div class="table-wrapper">
 
-        <table class="ledger-table">
+    <!-- TABLE -->
+
+    <div class="table-container">
+
+        <table>
 
             <thead>
 
                 <tr>
 
                     <th>Name</th>
-                    <th>Phone</th>
-                    <th>Amount Taken</th>
-                    <th>Starting Date</th>
 
-                    <th>Month 1</th>
-                    <th>Month 2</th>
-                    <th>Month 3</th>
-                    <th>Month 4</th>
-                    <th>Month 5</th>
-                    <th>Month 6</th>
-                    <th>Month 7</th>
-                    <th>Month 8</th>
-                    <th>Month 9</th>
-                    <th>Month 10</th>
+                    <th>Phone</th>
+
+                    <th>Amount Taken</th>
+
+                    <th>Interest / Month</th>
+
+                    <th>Start Date</th>
+
+
+                    {% for month in months %}
+
+                        <th class="month-header">
+                            Month {{ month }}
+                        </th>
+
+                    {% endfor %}
+
 
                     <th>Total Paid</th>
-                    <th>Remaining</th>
+
+                    <th>Interest Paid</th>
+
+                    <th>Remaining Principal</th>
+
                     <th>Actions</th>
 
                 </tr>
@@ -68,109 +505,332 @@
 
             <tbody>
 
+
             {% for customer in customers %}
+
 
                 <tr>
 
-                    <td>
-                        <strong>{{ customer.name }}</strong>
+
+                    <!-- NAME -->
+
+                    <td class="customer-name">
+
+                        {{ customer["name"] }}
+
                     </td>
 
 
+                    <!-- PHONE -->
+
                     <td>
-                        {{ customer.phone or '-' }}
+
+                        {{ customer["phone"] or "-" }}
+
                     </td>
 
 
+                    <!-- AMOUNT -->
+
                     <td>
-                        ₹{{ "%.2f"|format(customer.amount_taken|float) }}
+
+                        ₹{{ "%.2f"|format(
+                            customer["amount_taken"]|float
+                        ) }}
+
                     </td>
 
 
-                    <td>
-                        {{ customer.start_date }}
+                    <!-- INTEREST -->
+
+                    <td class="interest">
+
+                        ₹{{ "%.2f"|format(
+                            customer["monthly_interest"]|float
+                        ) }}
+
+                        <div class="small-label">
+                            {{ customer["interest_rate"] }}% / month
+                        </div>
+
                     </td>
 
 
-                    {% for month in range(1, 11) %}
+                    <!-- START DATE -->
 
-                        <td class="installment-cell">
+                    <td>
 
-                            {% set found = namespace(value=false) %}
+                        {{ customer["start_date"] }}
 
-                            {% for payment in customer.payments %}
+                    </td>
 
-                                {% if payment.installment_number == month %}
 
-                                    <span class="paid">✓</span>
+                    <!-- MONTHS -->
 
-                                    {% set found.value = true %}
+                    {% for month in months %}
+
+
+                        <td>
+
+
+                            {% set payment =
+                                namespace(found=None)
+                            %}
+
+
+                            {% for p in customer["payments"] %}
+
+                                {% if
+                                    p["installment_number"] == month
+                                %}
+
+                                    {% set payment.found = p %}
 
                                 {% endif %}
 
                             {% endfor %}
 
 
-                            {% if not found.value %}
+                            <!-- PAYMENT ALREADY EXISTS -->
 
-                                <span class="empty">-</span>
+                            {% if payment.found %}
+
+
+                                <div class="paid-box">
+
+
+                                    <div class="paid-total">
+
+                                        ₹{{ "%.2f"|format(
+                                            payment.found["amount_paid"]|float
+                                        ) }}
+
+                                    </div>
+
+
+                                    <div class="paid-details">
+
+                                        <span class="principal">
+
+                                            Principal:
+                                            ₹{{ "%.2f"|format(
+                                                payment.found["principal_paid"]|float
+                                            ) }}
+
+                                        </span>
+
+
+                                        <br>
+
+
+                                        <span class="interest">
+
+                                            Interest:
+                                            ₹{{ "%.2f"|format(
+                                                payment.found["interest_paid"]|float
+                                            ) }}
+
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="payment-date">
+
+                                        {{ payment.found["payment_date"] }}
+
+                                    </div>
+
+
+                                </div>
+
+
+                            <!-- NEXT PAYMENT -->
+
+                            {% elif
+                                month ==
+                                (customer["payments"]|length + 1)
+                                and
+                                customer["remaining_principal"] > 0
+                            %}
+
+
+                                <div class="payment-box">
+
+
+                                    <div class="auto-interest">
+
+                                        Monthly Interest:
+                                        ₹{{ "%.2f"|format(
+                                            customer["monthly_interest"]|float
+                                        ) }}
+
+                                    </div>
+
+
+                                    <div class="auto-info">
+
+                                        Enter TOTAL payment
+
+                                    </div>
+
+
+                                    <input
+                                        type="number"
+                                        min="0.01"
+                                        step="0.01"
+                                        id="payment_{{ customer['id'] }}_{{ month }}"
+                                        placeholder="Total ₹"
+                                    >
+
+
+                                    <button
+                                        type="button"
+                                        class="pay-btn"
+                                        onclick="
+                                            recordMonthlyPayment(
+                                                {{ customer['id'] }},
+                                                {{ month }},
+                                                {{ customer['remaining_principal']|float }},
+                                                {{ customer['monthly_interest']|float }}
+                                            )
+                                        "
+                                    >
+                                        Pay
+                                    </button>
+
+
+                                </div>
+
+
+                            <!-- COMPLETED -->
+
+                            {% elif
+                                customer["remaining_principal"] <= 0
+                            %}
+
+
+                                <span class="completed">
+
+                                    Completed
+
+                                </span>
+
+
+                            <!-- EMPTY FUTURE MONTH -->
+
+                            {% else %}
+
+
+                                <span style="color:#aaa;">
+
+                                    —
+
+                                </span>
+
 
                             {% endif %}
 
+
                         </td>
+
 
                     {% endfor %}
 
 
-                    <td class="total-paid">
+                    <!-- TOTAL PAID -->
 
-                        ₹{{ "%.2f"|format(customer.total_paid|float) }}
+                    <td>
+
+                        <strong>
+
+                            ₹{{ "%.2f"|format(
+                                customer["total_paid"]|float
+                            ) }}
+
+                        </strong>
 
                     </td>
 
+
+                    <!-- INTEREST PAID -->
+
+                    <td class="interest">
+
+                        ₹{{ "%.2f"|format(
+                            customer["total_interest_paid"]|float
+                        ) }}
+
+                    </td>
+
+
+                    <!-- REMAINING -->
 
                     <td class="remaining">
 
-                        ₹{{ "%.2f"|format(customer.remaining_amount|float) }}
+                        ₹{{ "%.2f"|format(
+                            customer["remaining_principal"]|float
+                        ) }}
 
                     </td>
 
 
-                    <td class="actions">
+                    <!-- ACTIONS -->
+
+                    <td>
+
+
+                        <!-- HISTORY -->
 
                         <a
-                            href="/add-payment/{{ customer.id }}"
-                            class="action-btn payment-btn">
-                            + Payment
+                            href="{{ url_for(
+                                'payment_history',
+                                customer_id=customer['id']
+                            ) }}"
+                            class="action-btn history-btn"
+                        >
+                            Payment History
                         </a>
 
 
-                        <a
-                            href="/payment-history/{{ customer.id }}"
-                            class="action-btn history-btn">
-                            History
-                        </a>
-
+                        <!-- DELETE -->
 
                         <form
-                            action="/delete-customer/{{ customer.id }}"
                             method="POST"
-                            style="display:inline;"
-                            onsubmit="return confirm('Are you sure you want to delete {{ customer.name }}?');">
+                            action="{{ url_for(
+                                'delete_customer',
+                                customer_id=customer['id']
+                            ) }}"
+                            onsubmit="
+                                return confirm(
+                                    'Are you sure you want to delete this customer?'
+                                );
+                            "
+                            style="margin: 0;"
+                        >
 
                             <button
                                 type="submit"
-                                class="action-btn delete-btn">
-                                🗑 Delete
+                                class="action-btn delete-btn"
+                                style="
+                                    border: none;
+                                    cursor: pointer;
+                                "
+                            >
+                                Delete
                             </button>
 
                         </form>
 
+
                     </td>
+
 
                 </tr>
 
+
             {% endfor %}
+
 
             </tbody>
 
@@ -181,23 +841,190 @@
 
     {% else %}
 
-        <div class="empty-state">
 
-            <h2>No Monthly Customers</h2>
+        <!-- EMPTY -->
 
-            <p>
-                There are currently no active monthly customers.
-            </p>
+        <div class="table-container">
 
-            <a href="/add-customer" class="btn primary">
-                + Add Customer
-            </a>
+            <div class="empty">
+
+                <h2>
+                    No Monthly Customers
+                </h2>
+
+                <p>
+                    Add a customer to start monthly payments.
+                </p>
+
+                <a
+                    href="{{ url_for('add_customer') }}"
+                    class="btn add-btn"
+                >
+                    + Add Customer
+                </a>
+
+            </div>
 
         </div>
 
+
     {% endif %}
+
 
 </div>
 
+
+<script>
+
+function recordMonthlyPayment(
+    customerId,
+    installmentNumber,
+    remainingPrincipal,
+    monthlyInterest
+) {
+
+    const input =
+        document.getElementById(
+            `payment_${customerId}_${installmentNumber}`
+        );
+
+
+    if (!input) {
+
+        alert("Payment input was not found.");
+
+        return;
+
+    }
+
+
+    const totalPayment =
+        parseFloat(input.value);
+
+
+    if (
+        isNaN(totalPayment) ||
+        totalPayment <= 0
+    ) {
+
+        alert(
+            "Please enter a valid total payment amount."
+        );
+
+        return;
+
+    }
+
+
+    const maximumPayment =
+        remainingPrincipal +
+        monthlyInterest;
+
+
+    if (totalPayment > maximumPayment) {
+
+        alert(
+            "The maximum payment for this month is ₹" +
+            maximumPayment.toFixed(2) +
+            "."
+        );
+
+        return;
+
+    }
+
+
+    let principalPaid =
+        totalPayment -
+        monthlyInterest;
+
+
+    if (principalPaid < 0) {
+
+        principalPaid = 0;
+
+    }
+
+
+    if (principalPaid > remainingPrincipal) {
+
+        principalPaid =
+            remainingPrincipal;
+
+    }
+
+
+    const actualInterest =
+        totalPayment -
+        principalPaid;
+
+
+    const message =
+        "Total Payment: ₹" +
+        totalPayment.toFixed(2) +
+
+        "\n\nInterest: ₹" +
+        actualInterest.toFixed(2) +
+
+        "\nPrincipal: ₹" +
+        principalPaid.toFixed(2) +
+
+        "\nRemaining Principal: ₹" +
+        (
+            remainingPrincipal -
+            principalPaid
+        ).toFixed(2) +
+
+        "\n\nDo you want to record this payment?";
+
+
+    if (!confirm(message)) {
+
+        return;
+
+    }
+
+
+    const form =
+        document.createElement("form");
+
+
+    form.method = "POST";
+
+
+    form.action =
+        `/record-payment/${customerId}/${installmentNumber}`;
+
+
+    const hiddenAmount =
+        document.createElement("input");
+
+
+    hiddenAmount.type = "hidden";
+
+    hiddenAmount.name = "amount_paid";
+
+    hiddenAmount.value =
+        totalPayment;
+
+
+    form.appendChild(
+        hiddenAmount
+    );
+
+
+    document.body.appendChild(
+        form
+    );
+
+
+    form.submit();
+
+}
+
+</script>
+
+
 </body>
+
 </html>

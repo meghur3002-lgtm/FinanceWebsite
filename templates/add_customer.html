@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,15 +18,32 @@
     <div class="form-card">
 
         <div class="form-header">
+
             <h1>Add Customer</h1>
 
             <p>
                 Enter the customer's payment details
             </p>
+
         </div>
 
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
 
-        <form method="POST" action="/add-customer">
+                {% for message in messages %}
+
+                    <div class="flash">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+        {% endwith %}
+
+
+        <form method="POST"
+              action="{{ url_for('add_customer') }}">
 
 
             <!-- Customer Name -->
@@ -72,6 +90,7 @@
                 </label>
 
                 <div class="input-with-symbol">
+
                     <span>₹</span>
 
                     <input
@@ -80,9 +99,42 @@
                         name="amount_taken"
                         placeholder="Enter amount"
                         step="0.01"
-                        min="0"
+                        min="0.01"
                         required>
+
                 </div>
+
+            </div>
+
+
+            <!-- Interest Rate -->
+
+            <div class="form-group">
+
+                <label for="interest_rate">
+                    Interest Rate
+                </label>
+
+                <div class="input-with-symbol">
+
+                    <input
+                        type="number"
+                        id="interest_rate"
+                        name="interest_rate"
+                        placeholder="Example: 4"
+                        step="0.01"
+                        min="0"
+                        value="0">
+
+                    <span>%</span>
+
+                </div>
+
+                <small>
+                    For Monthly customers, this is the monthly
+                    interest rate based on the original amount.
+                    Example: 4 = 4% per month.
+                </small>
 
             </div>
 
@@ -143,17 +195,25 @@
                 </label>
 
                 <div class="input-with-symbol">
+
                     <span>₹</span>
 
                     <input
                         type="number"
                         id="payment_amount"
                         name="payment_amount"
-                        placeholder="Enter weekly/monthly payment"
+                        placeholder="Optional"
                         step="0.01"
-                        min="0"
-                        required>
+                        min="0">
+
                 </div>
+
+                <small>
+                    Monthly: Leave this empty. You will enter the
+                    TOTAL payment on the Monthly page.
+                    <br>
+                    Weekly: Enter the regular weekly payment amount.
+                </small>
 
             </div>
 
@@ -162,13 +222,17 @@
 
             <div class="form-actions">
 
-                <a href="/" class="cancel-btn">
+                <a
+                    href="{{ url_for('index') }}"
+                    class="cancel-btn"
+                >
                     Cancel
                 </a>
 
                 <button
                     type="submit"
-                    class="save-btn">
+                    class="save-btn"
+                >
                     Save Customer
                 </button>
 
@@ -179,6 +243,49 @@
     </div>
 
 </div>
+
+
+<script>
+
+const today = new Date();
+
+const year = today.getFullYear();
+
+const month =
+    String(today.getMonth() + 1)
+    .padStart(2, "0");
+
+const day =
+    String(today.getDate())
+    .padStart(2, "0");
+
+document.getElementById("start_date").value =
+    `${year}-${month}-${day}`;
+
+
+document.getElementById("payment_type").addEventListener(
+    "change",
+    function () {
+
+        const paymentAmount =
+            document.getElementById("payment_amount");
+
+        if (this.value === "Monthly") {
+
+            paymentAmount.placeholder =
+                "Leave empty for Monthly";
+
+        } else {
+
+            paymentAmount.placeholder =
+                "Enter weekly payment";
+
+        }
+
+    }
+);
+
+</script>
 
 </body>
 </html>
